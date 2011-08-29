@@ -1,0 +1,9 @@
+<?php
+
+/**
+ * Implementation of hook_init.
+ */
+function views_slideshow_xtra_init () {
+	drupal_add_css(drupal_get_path("module", "views_slideshow_xtra")."/views_slideshow_xtra.css");
+	drupal_add_js(drupal_get_path("module", "views_slideshow_xtra")."/views_slideshow_xtra.js", "module", "header", true);
+}

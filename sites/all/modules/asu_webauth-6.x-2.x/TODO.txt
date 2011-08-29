@@ -1,0 +1,105 @@
+* ASU Webauth 6.x-2.x Tasks
+** Post 2.0 release
+*** TODO Provide upgrade path to convert existing users to asurite@ASU.EDU users
+
+** Completed for 2.0 release
+*** DONE Provide an admin form for adding new webauth users
+    CLOSED: [2010-08-30 Mon 20:58]
+    :LOGBOOK:
+    - State "DONE"       from "TODO"       [2010-08-30 Mon 20:58]
+    :END:
+
+*** DONE What's up with form validation errors and webauth?
+    CLOSED: [2010-08-30 Mon 20:58]
+    :LOGBOOK:
+    - State "DONE"       from "TODO"       [2010-08-30 Mon 20:58]
+    :END:
+
+*** DONE If verify each page is set, fallback to keep user logged in if verify is down
+    CLOSED: [2010-08-30 Mon 20:58]
+    :LOGBOOK:
+    - State "DONE"       from "TODO"       [2010-08-30 Mon 20:58]
+    :END:
+
+*** DONE How to handle form submits when verifying on every page load?
+    CLOSED: [2010-08-30 Mon 20:58]
+    :LOGBOOK:
+    - State "DONE"       from "TODO"       [2010-08-30 Mon 20:58]
+    :END:
+
+*** DONE Anonymous bind to LDAP to retrieve additional user data?     :MAYBE:
+    CLOSED: [2010-08-30 Mon 20:58]
+    :LOGBOOK:
+    - State "DONE"       from "TODO"       [2010-08-30 Mon 20:58]
+    :END:
+    http://help.asu.edu/LDAP_and_Directory_Services_Information
+
+    Provide this in an additional, separate module
+
+*** CANCELLED If user gets "Access denied" attempt to verify with webauth :CANCELLED:
+    CLOSED: [2010-08-30 Mon 20:58]
+    :LOGBOOK:
+    - State "CANCELLED"  from "TODO"       [2010-08-30 Mon 20:58]
+    :END:
+
+*** DONE Continue to review CAS module architecture and implement any problems they solve
+    CLOSED: [2010-01-30 Sat 16:12]
+    - State "DONE"       [2010-01-30 Sat 16:12]
+
+*** DONE Force login on /user page, but not /user/login page
+    CLOSED: [2010-01-28 Thu 09:35]
+    - State "DONE"       [2010-01-28 Thu 09:35]
+
+*** DONE Add triedWebauth=1 check
+    CLOSED: [2009-12-18 Fri 10:37]
+    - State "DONE"       [2009-12-18 Fri 10:37]
+*** DONE Provide a debug toggle in admin options
+    CLOSED: [2009-11-20 Fri 13:06]
+    - State "DONE"       [2009-11-20 Fri 13:06]
+*** DONE Override settings for cookies, etc. to match webauth standards
+    CLOSED: [2009-11-20 Fri 12:54]
+    - State "DONE"       [2009-11-20 Fri 12:54]
+
+*** DONE Ensure we don't break xml-rpc, services, drush, etc.
+    CLOSED: [2009-11-20 Fri 12:30]
+    - State "DONE"       [2009-11-20 Fri 12:30]
+
+*** DONE Auto-register webauth users
+    CLOSED: [2009-09-17 Thu 15:43]
+
+*** DONE Allow usernames of the form asurite@ASU.EDU
+    CLOSED: [2009-09-17 Thu 15:43]
+
+*** DONE Sign-in successfully verified webauth users
+    CLOSED: [2009-09-17 Thu 15:50]
+    If user isn't signed in, always try to get an authenticator if they
+    don't have the 'noauth' session var
+
+*** DONE Store authenticator token in session and use it for verify calls
+    CLOSED: [2009-09-18 Fri 09:29]
+
+*** DONE Verify on every page view
+    CLOSED: [2009-09-18 Fri 09:29]
+
+*** DONE Redirect user back to page they came from when they logout (optional)
+    CLOSED: [2009-09-18 Fri 10:36]
+
+*** DONE Alter user form based on settings
+    CLOSED: [2009-09-18 Fri 11:21]
+
+*** DONE Alter change password link based on settings
+    CLOSED: [2009-09-18 Fri 12:42]
+
+*** DONE Alter registration link based on settings
+    CLOSED: [2009-09-18 Fri 12:42]
+*** DONE Handle "destination=..." arguments on login URLs
+    CLOSED: [2009-10-06 Tue 09:48]
+
+*** DONE Alter existing "login or register" links
+    CLOSED: [2009-10-06 Tue 09:49]
+    hook_link_alter():
+    - $links['comment_forbidden']
+
+    *OR*
+
+    Force webauth login at user/login.

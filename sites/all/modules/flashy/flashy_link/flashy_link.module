@@ -1,0 +1,49 @@
+<?php
+// $Id: flashy_link.module,v 1.1 2009/03/19 19:50:10 crell Exp $
+
+/**
+ * Implementation of hook_theme().
+ */
+function flashy_link_theme() {
+  return array(
+    'flashy_link_formatter_videoplayer' => array(
+      'arguments' => array('element' => NULL),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_field_formatter_info().
+ */
+function flashy_link_field_formatter_info() {
+  return array(
+    'videoplayer' => array(
+      'label' => t('As Flash video'),
+      'field types' => array('link'),
+      'multiple values' => CONTENT_HANDLE_MODULE,
+    ),
+  );
+}
+
+/**
+ * Theme a link as a link to a flash video file to be played using Flashy.
+ *
+ * @ingroup themeable
+ */
+function theme_flashy_link_formatter_videoplayer($element) {
+  $output = '';
+
+  if (!count(element_children($element))) {
+    return '';
+  }
+
+  $flashy = flashy_create();
+  $flashy->noFlash(check_plain($element[$key]['#item']['title']));
+
+  foreach (element_children($element) as $key) {
+    $flashy->addMedia($element[$key]['#item']['url']);
+  }
+  $output .= $flashy->render();
+
+  return $output;
+}

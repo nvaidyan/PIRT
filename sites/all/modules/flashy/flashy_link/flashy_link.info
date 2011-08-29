@@ -1,0 +1,13 @@
+; $Id: flashy_link.info,v 1.1 2009/03/19 19:50:10 crell Exp $
+name = Flashy Link formatter
+description = Format a Link field as a Flash video
+core = 6.x
+dependencies[] = flashy
+dependencies[] = link
+package = CCK
+; Information added by drupal.org packaging script on 2009-10-02
+version = "6.x-1.0"
+core = "6.x"
+project = "flashy"
+datestamp = "1254502550"
+

@@ -1,0 +1,91 @@
+<?php
+// $Id$
+
+
+/**
+ * @file
+ * Installation-related callbacks for ASU Webauth module.
+ */
+
+
+/**
+ * Implementation of hook_requirements().
+ */
+function asu_webauth_requirements($phase) {
+  $requirements = array();
+  $t = get_t();
+  // Only run checks if it's the runtime phase (ignore install phase)
+  if ($phase == 'runtime') {
+    $title = $t('ASU Webauth');
+    $severity = REQUIREMENT_OK;
+    $messages = array();
+
+    // Test verify connection
+    $verify_check = asu_webauth_verify(user_password(), '127.0.0.1', TRUE);
+    if ($verify_check == 7) {
+      $messages[] = $t('Successfully connected to the Webauth verify server.');
+    }
+    else {
+      $messages[] = '<strong>'. $t('Failed to connect to the Webauth verify server.') .'</strong>';
+      $severity = REQUIREMENT_ERROR;
+    }
+
+    if (function_exists('ldap_search')) {
+      $messages[] = $t('LDAP libraries available for user common name lookup and validation of accounts when adding users to Drupal.');
+    }
+    else {
+      $messages[] = '<strong>'. $t('LDAP libraries are not available. User common name lookup and validation of accounts will not be available, but Webauth should continue to operate normally.') .'</strong>';
+      $severity = REQUIREMENT_WARNING;
+    }
+    $requirements['asu_webauth'] = array(
+      'title' => $title,
+      'value' => implode('<br/>', $messages),
+      'severity' => $severity,
+    );
+  }
+  return $requirements;
+}
+
+
+/**
+ * Implementation of hook_schema().
+ */
+function asu_webauth_schema() {
+  $schema = array();
+  $schema['cache_asuwebauth'] = drupal_get_schema_unprocessed('system', 'cache');
+  return $schema;
+}
+
+
+/**
+ * Implementation of hook_install().
+ */
+function asu_webauth_install() {
+  drupal_install_schema('asu_webauth');
+}
+
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function asu_webauth_uninstall() {
+  drupal_uninstall_schema('asu_webauth');
+  $sql = "DELETE FROM {variable} WHERE name LIKE 'asu_webauth_%'";
+  db_query($sql);
+}
+
+
+/**
+ * Implementation of hook_update_N().
+ */
+function asu_webauth_update_6200() {
+  $ret = array();
+  // Make sure the cache table is setup
+  if (!db_table_exists('cache_asuwebauth')) {
+    $ret += drupal_install_schema('asu_webauth');
+  }
+  // Clear out anonymous sessions so that Webauth works right after upgrading
+  $sql = "DELETE FROM {sessions} WHERE uid = 0";
+  $ret[] = update_sql($sql);
+  return $ret;
+}

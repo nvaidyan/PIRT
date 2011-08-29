@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Import / Export API Reference: csv engines</title>
+<style type="text/css">
+h2 {
+  border-bottom: 100% dashed 1px;
+}
+h3 {
+  background-color: #dfedf7;
+}
+td {
+  text-align: center;
+}
+.help {
+  background-color: #ffc;
+}
+.x {
+  background-color: #dfedf7;
+}
+.verified {
+  background-color: #CFC;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Import / Export API Reference: csv engines</h1>
+
+<p>This document provides a programmer's reference to the <em>csv get</em> and <em>csv put</em> engines of the Drupal Import / Export API. For an explanation of the field types and their core properties, see the main <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html">Import / Export API reference</a> document.</p>
+<p>Skip to: <a href="#properties">Properties</a></p>
+
+<h2>Fields and properties matrix</h2>
+
+<p><strong>Legend:</strong><br />
+<strong>X</strong> = property can be used with this field type<br />
+<strong>-</strong> = this property is not applicable to this field type</p>
+
+<table border="1">
+  <tr>
+    <th scope="col"><a href="#type"><strong>#type</strong></a></th>
+
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#array">array</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#datetime">datetime</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#entity">entity</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#file">file</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#float">float</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#freeform">freeform</a></th>
+
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#int">int</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#serialized">serialized</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#string">string</a></th>
+  </tr>
+  <tr>
+    <th scope="row"><a href="#csv_hidden">#csv_hidden</a></th>
+    <td>-</td>
+
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+  <tr>
+    <th scope="row"><a href="#csv_mapping">#csv_mapping</a></th>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+  </tr>
+  <tr>
+    <th scope="row"><a href="#csv_plural">#csv_plural</a></th>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+  </tr>
+</table>
+
+<h2><a name="properties" id="properties"></a>Properties</h2>
+
+<h3><a name="csv_hidden" id="csv_hidden"></a>#csv_hidden</h3>
+
+<p><strong>Used by</strong>: ALL types except <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#entity">entity</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#array">array</a>.</p>
+
+<p><strong>Description</strong>: When set to TRUE, indicates that this field should not be outputted during a csv 'put' operation.</p>
+<p><strong>Values</strong>: Boolean.</p>
+<p><strong>Default value</strong>: NULL</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_comment.inc">importexportapi_comment.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'comment_statistics_nid'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'int'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Node&nbsp;ID'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#reference_entity'&nbsp;</font><font color="#007700">=&gt;&nbsp;,<br />&nbsp; </font><font color="#DD0000">'#reference_field'&nbsp;</font><font color="#007700">=&gt;&nbsp;array(</font><font color="#DD0000">'nid'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#db_table'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'node_comment_statistics'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#db_field_unaliased'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'nid'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#key_component'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#csv_hidden'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="csv_mapping" id="csv_mapping"></a>#csv_mapping</h3>
+
+<p><strong>Used by</strong>: ALL types except <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#entity">entity</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#array">array</a>.</p>
+<p><strong>Description</strong>: The CSV column heading name for this field. During a 'put' operation, the values of this field will be outputted in a column underneath this name; and during a 'get' operation, the system will search for a column with this name. This should NOT be confused with the <a href="#csv_plural">#csv_plural</a> property, which applies to CSV file names.</p>
+<p><strong>Values</strong>: A valid CSV column heading name. <strong>Note:</strong> this value must be unique for all direct child fields of a given entity or array.</p>
+
+<p><strong>Default value</strong>: inherited from the <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#id">#id</a> property of this field.</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_menu.inc">importexportapi_menu.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'path'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'System&nbsp;path'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#xml_mapping'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'system-path'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#csv_mapping'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'system-path'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#unique'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="csv_plural" id="csv_plural"></a>#csv_plural</h3>
+
+<p><strong>Used by</strong>: <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#entity">entity</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#array">array</a>.</p>
+<p><strong>Description</strong>: The CSV file name for this field. During a 'put' operation, the values of the direct children of this field will be outputted to a file (or to a portion of the screen) with this name; and during a 'get' operation, the system will search for files with this name. This property should NOT be confused with the <a href="#csv_mapping">#csv_mapping</a> property, which applies to the column heading names for fields within files.</p>
+<p><strong>Values</strong>: A valid file name. <strong>Note:</strong> this value must be unique for all fields to which it applies.</p>
+
+<p><strong>Default value</strong>: inherited from the <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#id">#id</a> property of this field.</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_node.inc">importexportapi_node.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def&nbsp;</font><font color="#007700">=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'entity'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Node'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#db_default_table'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'node'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#xml_plural'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'nodes'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#csv_plural'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'nodes'<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+</body>
+</html>

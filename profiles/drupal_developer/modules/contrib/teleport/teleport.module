@@ -1,0 +1,515 @@
+<?php
+// $Id: teleport.module,v 1.1.2.16 2008/10/23 16:16:00 incidentist Exp $ 
+
+/**
+  * @file teleport
+  * Allows Quicksilver-like "launching" to different pages.
+  * An accesskey brings up the console. Type the title or path of the page you
+  * want to go to, or hit the accesskey again to close.
+  */
+
+/**
+ * Default hotkey for bringing up the Teleport dialog.
+ */
+define('TELEPORT_DEFAULT_HOTKEY', 'M');
+
+
+/**
+ * Specifies how many paths to store in the recent paths list. When a user submits
+ * the Teleport form, the path they're jumping to gets added to the list so that it
+ * gets preferred in future searches.
+ */
+define('TELEPORT_RECENT_ITEMS_LIMIT', 50);
+
+/**
+ * Implementation of hook_perm().
+ */
+function teleport_perm() {
+  return array('use teleport', 'administer teleport');
+}
+
+/**
+  * Add three callbacks: one for completing the items, one for completing the actions, 
+  * and one to handle submissions.
+  */
+function teleport_menu() {
+  $items = array();
+
+  $items['teleport/autocomplete/title'] = array(
+    'title' => 'Autocomplete title',
+    'page callback' => '_teleport_autocomplete_title',
+    'page arguments' => array(3),
+    'access arguments' => array('use teleport'),
+    'type' => MENU_CALLBACK,
+    );
+
+  $items['teleport/submit'] = array(
+    'title' => 'Teleport Submit',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('teleport_form'),
+    'access arguments' => array('use teleport'),
+    'type' => MENU_CALLBACK,
+    );
+
+  $items['teleport/results/%menu_tail'] = array(
+    'title' => 'Search Results',
+    'page callback' => 'teleport_results_page',
+    'page arguments' => array(2),
+    'access arguments' => array('use teleport'),
+    'type' => MENU_CALLBACK,
+    );
+
+  $items['admin/settings/teleport'] = array(
+    'title' => 'Teleport',
+    'description' => "Manage settings for the Teleport utility.",
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('teleport_settings_form'),
+    'access arguments' => array('administer teleport'),
+    );
+
+  return $items;
+}
+
+/**
+  * Implementation of hook_init().
+  */
+function teleport_init() {
+  // Don't add js if we're autocompleting, to avoid conflicts with devel_themer.
+  if (function_exists('user_access') && user_access("use teleport") && !(arg(0) == 'teleport' && arg(1) == 'autocomplete')) {
+    drupal_add_css(drupal_get_path('module', 'teleport') .'/teleport.css');
+    drupal_add_js(drupal_get_path('module', 'teleport') .'/teleport.js');
+    // Need to add this because the form with the autocomplete doesn't 
+    // get loaded until the footer.
+    drupal_add_js('misc/autocomplete.js');
+  }
+}
+
+/**
+ * Implementation of hook_footer().
+ * We need this because calling drupal_get_form() in hook_init() initializes the theme
+ * too early. By calling it here, we get around that, but most of the page has
+ * already been themed, so we add the js to the footer. drupal_get_js('footer')
+ * gets called immediately after this, so this is something of a theme-dependant
+ * hack.
+ */
+function teleport_footer() {
+  if (function_exists('user_access') && user_access("use teleport") && !(arg(0) == 'teleport' && arg(1) == 'autocomplete')) {
+    drupal_add_js(array(
+    'teleport' => array(
+      'form' => drupal_get_form("teleport_form"),
+      'hotkey' => strtoupper(variable_get('teleport_hotkey', TELEPORT_DEFAULT_HOTKEY)),
+      )), 'setting', 'footer');
+  }
+}
+
+/**
+  * The teleport form.
+  * @param use_js
+  *   Set to TRUE if this form is javascript-activated, and should therefore include
+  *   "close" link.
+  */
+function teleport_form($use_js = TRUE) {
+  $form = array();
+  $form['#action'] = url("teleport/submit");
+  $form['teleport'] = array(
+    '#type' => 'fieldset',
+  );
+  $form['teleport']['label'] = array(
+    // include a buffer div to counteract weird padding issue on firefox
+    // '#prefix' => '<div class="teleport-buffer">',
+    '#value' => '<h2>'. t('Teleport') .'</h2>',
+  );
+  $form['teleport']['teleport-title'] = array(
+    '#type' => 'textfield',
+    '#description' => t("Enter the title or path of the page you want to go to. Press Ctrl-!hotkey again to close this window.", array('!hotkey' => variable_get('teleport_hotkey', TELEPORT_DEFAULT_HOTKEY))),
+    '#autocomplete_path' => 'teleport/autocomplete/title',
+    '#default_value' => isset($_SESSION['teleport']['last_string']) ? $_SESSION['teleport']['last_string'] : '',
+    '#size' => 35,
+  );
+
+  $form['teleport']['submit'] = array(
+    '#prefix' => '<div id="teleport-left-buttons">',
+    '#type' => 'submit',
+    '#value' => t('Teleport'),
+  );
+
+  if ($use_js) {
+    // Add close link
+    $form['teleport']['links'] = array(
+      '#value' => '<a href="#" id="teleport-close-link">'. t('Close') .'</a>'.'</div>',
+      );    
+  }
+
+  // Add settings link if user has access
+  if (user_access('administer teleport')) {
+    $form['teleport']['links']['#value'] .= '<div id="teleport-right-buttons">'.
+    l(t('Settings'), 'admin/settings/teleport') .'</div>';
+  }
+  return $form;
+}
+
+/**
+  * Returns the settings form.
+  */
+function teleport_settings_form($value = '') {
+  $catalog_types = array(
+    'menu_items' => t("Menu items"),
+    'nodes' => t("Nodes"),
+    'taxonomy' => t("Taxonomy terms"),
+    'users' => t("Users"),
+  );
+  $node_types = node_get_types('names');
+
+  $form = array();
+
+  $form['teleport_hotkey'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Hotkey'),
+    '#description' => t('The browser accesskey that will bring up the Teleport dialog.'),
+    '#default_value' => variable_get('teleport_hotkey', TELEPORT_DEFAULT_HOTKEY),
+    '#size' => 1,
+    '#maxlength' => 1,
+  );
+
+  $form['teleport_catalog_types'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('What to search'),
+    '#description' => t('The types of stuff Teleport should search through. It only searches names and titles, not content.'),
+    '#default_value' => variable_get('teleport_catalog_types', array_keys($catalog_types)),
+    '#options' => $catalog_types,
+  );
+
+  $form['teleport_node_types'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Node types'),
+    '#description' => t('The types of nodes that should be searched. This will be ignored if "nodes" isn\'t checked above'),
+    '#default_value' => variable_get('teleport_node_types', array_keys($node_types)),
+    '#options' => $node_types,
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+  * Teleport submission. If the path exists, redirect to it. If not, see how many matches
+  * there are. If there's only one, redirect to it. Otherwise, redirect to the results page.
+  */
+function teleport_form_submit($form, &$form_state) {
+  $path = $form_state['values']['teleport-title'];
+  $_SESSION['teleport']['last_string'] = $path;
+  $item = menu_get_item($path, NULL);
+  if ($item) {
+    _teleport_add_to_recent($path);
+    $form_state['redirect'] = $path;
+    return;
+  } 
+  else {
+    $matches = _teleport_matches($path, FALSE);
+    if (count($matches) == 1) {
+      $paths = array_keys($matches);
+      _teleport_add_to_recent($paths[0]);
+      $form_state['redirect'] = $paths[0];
+    } 
+    else {
+      $form_state['redirect'] = 'teleport/results/'. $path;
+    }
+  }
+}
+
+/**
+  * If no menu item was found for the query, list the candidates here.
+  * TODO: Add whatever they click on to the SESSION queue for next time.
+  */
+function teleport_results_page($query) {
+  $output = '';  
+  $query = _teleport_get_keys(2);
+  $matches = _teleport_matches($query, FALSE);
+  if (count($matches) == 0) {
+    $output .= '<p>'. t('The system could not find any matches for your search. Try again.') .'</p>';
+    $output .= drupal_get_form('teleport_form', FALSE);
+  } 
+  else {
+    $output .= '<p>'. t('The system could not determine which page you wanted to jump to. Please select from the list below.') .'</p>';
+    $rows = array();
+    foreach ($matches as $path => $title) {
+      $rows[] = array(l($title, $path));
+    }
+    $headers = array(t("Page"));
+    $output .= theme('table', $headers, $rows);
+  }
+  return $output;
+}
+
+/**
+  * Autocomplete for title field.
+  * @param $query
+  *   String to search catalog for.
+  */
+function _teleport_autocomplete_title($query = '') {
+  $matches = _teleport_matches($query);
+  foreach ($matches as $path => $title) {
+    $matches[$path] = _teleport_highlight_search(check_plain($title), $query) .
+      '<span class="teleport-path"> - '. _teleport_highlight_search(check_plain($path), $query) .'</span>';
+  }
+  drupal_json($matches);
+}
+
+/**
+  * Finds matches for a query.
+  * @param query
+  *   String to search for.
+  * @param fetch_args
+  *   TRUE if the query should be fetched from the URL, to deal properly with strings
+  *   with slashes in them.
+  *   Set to FALSE if you're calling from a function that can pass the full path.
+  * @return
+  *   An array of matches whose keys are paths and values are titles.
+  */
+function _teleport_matches($query = '', $fetch_args = TRUE) {
+  if ($fetch_args) {
+    $query = _teleport_get_keys(3);
+  }
+  $query = strtolower($query);
+  $catalog_types = variable_get('teleport_catalog_types', array('menu_items', 'nodes', 'taxonomy'));
+  $matches = array();
+  if ($query) {
+    // The list of aliases that match the query
+    $aliases = array();
+    if (module_exists('path')) {
+      _teleport_search_aliases($query, $aliases);
+    }
+    foreach ($catalog_types as $type) {
+      if ($type != '0') {
+        $matches = call_user_func('_teleport_matches_'. $type, $query, $matches, $aliases);
+      }
+    }
+    // when we add other kinds of things, they should get a _teleport_matches_ function
+    // until there's a hook infrastructure in place.
+  }
+  return $matches;
+}
+
+/**
+  * Searches menu items.
+  */
+function _teleport_matches_menu_items($query, &$matches, $aliases = array()) {
+  // add menu results
+  $menus = menu_router_build();
+  foreach ($menus as $path => $item) {
+    if (_teleport_should_include_menu_item($item, $path, $query, $aliases[$path] ? $aliases[$path] : $path)) {
+      _teleport_add_to_matches($path, $item['title'], $matches);
+    }
+  }
+  return $matches;
+}
+
+/**
+  * Searches nodes.
+  */
+function _teleport_matches_nodes($query, &$matches, $aliases = array()) {
+  if (!user_access("access content")) {
+    return $matches;
+  }
+  // add node results
+  // todo: optimize this
+  $node_types = variable_get('teleport_node_types', array_keys(node_get_types('names')));
+  if (count($node_types)) {
+    $result = db_query_range("SELECT nid, title FROM {node} WHERE type IN ('". join("','", $node_types) ."') AND LOWER(title) LIKE LOWER('%%%s%%')", $query, 0, 10);
+    while ($node = db_fetch_object($result)) {
+      if (user_access('administer nodes') || node_access('view', node_load($node->nid))) {
+        _teleport_add_to_matches('node/'. $node->nid, $node->title, $matches);      
+      }  
+    }
+    // Check aliases. If the src of an alias is a node, add it to the list.
+    foreach ($aliases as $src => $dst) {
+      if (preg_match('/^node\/(\d+)$/', $src, $nid) && isset($nid[1]) && !isset($matches[$src])) {
+        $node = node_load($nid[1]);
+        if ($node->nid && node_access('view', $node)) {
+          _teleport_add_to_matches($src, $node->title, $matches);
+          unset($aliases[$src]);
+        }
+      }
+    }
+  }
+  return $matches;
+}
+
+/**
+  * Searches taxonomy terms.
+  */
+function _teleport_matches_taxonomy($query, &$matches, $aliases = array()) {
+  // add taxonomy term results
+  // todo: optimize this
+  $result = db_query_range("SELECT tid, name FROM {term_data} WHERE LOWER(name) LIKE LOWER('%%%s%%')", $query, 0, 10);
+  while ($term = db_fetch_object($result)) {
+    _teleport_add_to_matches('taxonomy/term/'. $term->tid, $term->name, $matches);    
+  }
+  foreach ($aliases as $src => $dst) {
+    if (preg_match('/^taxonomy\/term\/(\d+)$/', $src, $tid) && isset($tid[1]) && !isset($matches[$src])) {
+      $term = taxonomy_get_term($tid[1]);
+      if (isset($term->tid)) {
+        _teleport_add_to_matches($src, $term->name, $matches);
+        unset($aliases[$src]);
+      }
+    }
+  }
+  return $matches;
+}
+
+/**
+  * Searches usernames.
+  */
+function _teleport_matches_users($query, &$matches, $aliases = array()) {
+  // todo: optimize this
+  $result = db_query_range("SELECT uid, name FROM {users} WHERE LOWER(name) LIKE LOWER('%%%s%%')", $query, 0, 10);
+  while ($user = db_fetch_object($result)) {
+    _teleport_add_to_matches('user/'. $user->uid, $user->name, $matches);    
+  }
+  foreach ($aliases as $src => $dst) {
+    if (preg_match('/^user\/(\d+)$/', $src, $uid) && isset($uid[1]) && !isset($matches[$src])) {
+      $user = user_load($tid[1]);
+      if (isset($user->uid)) {
+        _teleport_add_to_matches($src, $user->name, $matches);
+        unset($aliases[$src]);
+      }
+    }
+  }
+  return $matches;
+}
+
+/**
+ * Finds all aliases that match a query.
+ * @param query
+ * The query to search.
+ * @param matches
+ * Array of matches to add results to.
+ * @return
+ * Nothing, but $matches contains the matching aliases that need to be filtered
+ * by the other matching functions.
+ */
+function _teleport_search_aliases($query, &$matches) {
+  $alias_query = db_query_range("SELECT src, dst FROM {url_alias} WHERE dst LIKE LOWER('%%%s%%')", $query, 0, 10);
+  while ($alias = db_fetch_object($alias_query)) {
+    $matches[$alias->src] = $alias->dst;
+  }
+}
+
+/**
+ * Searches through various aspects of a menu item for a query.
+ * @param item
+ * The item to search.
+ * @param path
+ * The item's path.
+ * @param query
+ * The search query entered by the user (lowercased).
+ * @param alias
+ * An alias found for the path, if there is one.
+ * @return
+ * TRUE if the query was found in the menu item.
+ */
+function _teleport_should_include_menu_item($item, $path, $query, $alias) {
+  $is_in_path = (strpos($path, $query) !== FALSE) || (strpos($alias, $query) !== FALSE);
+  $is_in_title = strpos(strtolower($item['title']), $query) !== FALSE;
+  
+  return 
+    ($is_in_path || $is_in_title) &&
+    $item['type'] != MENU_CALLBACK &&
+    _teleport_can_access_menu_item($item, $path);
+}
+
+/**
+  * Returns true if the user has access to the path.
+  * Copied from _menu_check_access(), which doesn't work with this kind of menu item.
+  */
+function _teleport_can_access_menu_item($item, $path) {
+  // Determine access callback, which will decide whether or not the current
+  // user has access to this path.
+  $callback = empty($item['access callback']) ? 0 : trim($item['access callback']);
+  // Check for a TRUE or FALSE value.
+  if (is_numeric($callback)) {
+    $item['access'] = (bool)$callback;
+  }
+  else {
+    // If access args are integers, there's nothing we can do.
+    // todo: what can we do about page args?
+    foreach ($item['access arguments'] as $arg) {
+      if (is_int($arg)) {
+        return FALSE;
+      }
+    }
+    // remove integer args, because we can't make that swap here.
+    $arguments = $item['access arguments'];
+    // As call_user_func_array is quite slow and user_access is a very common
+    // callback, it is worth making a special case for it.
+    if ($callback == 'user_access') {
+      $item['access'] = (count($arguments) == 1) ? user_access($arguments[0]) : user_access($arguments[0], $arguments[1]);
+    }
+    else {
+      $item['access'] = call_user_func_array($callback, $arguments);
+    }
+  }
+  return $item['access'];
+}
+
+/**
+  * Helper function for grabbing search keys.
+  * @param $arg
+  *   Integer representing the arg in the URL where the keys are.
+  */
+function _teleport_get_keys($arg) {
+  // Extract keys as remainder of path
+  // Note: support old GET format of searches for existing links.
+  $path = explode('/', $_GET['q'], $arg + 1);
+  return $path[$arg] ? $path[$arg] : '';
+}
+
+/**
+ * Adds a path and title to the front or back of $matches, depending
+ * on whether the match is recent or not.
+ */
+function _teleport_add_to_matches($path, $title, &$matches) {
+  $path = drupal_get_path_alias($path);
+  if (_teleport_is_in_recent($path)) {
+    $matches = array_merge(array($path => $title), $matches);
+  } 
+  else {
+    $matches = array_merge($matches, array($path => $title));
+  }
+  return $matches;
+}
+
+/**
+  * Adds a path to list of recently used paths.
+  * @return
+  * The array of recently used paths.
+  */
+function _teleport_add_to_recent($path) {
+  // todo: How to limit the number of things? PHP has no hashstack.
+  $path = drupal_get_path_alias($path);
+  if (!isset($_SESSION['teleport']['recent'])) {
+    $_SESSION['teleport']['recent'] = array();
+  }
+  array_push($_SESSION['teleport']['recent'], $path);
+  if (count($_SESSION['teleport']['recent']) > TELEPORT_RECENT_ITEMS_LIMIT) {
+    $_SESSION['teleport']['recent'] = array_slice($_SESSION['teleport']['recent'], TELEPORT_RECENT_ITEMS_LIMIT);
+  }
+  return $_SESSION['teleport']['recent'];
+}
+
+/**
+ * Checks to see if a path has been visited.
+ */
+function _teleport_is_in_recent($path) {
+  if (isset($_SESSION['teleport']['recent'])) {
+    return in_array($path, $_SESSION['teleport']['recent']);
+  } 
+  else {
+    return FALSE;
+  }
+}
+
+function _teleport_highlight_search($haystack, $needle) {
+  $pattern = '('. quotemeta($needle) .')';
+  $replacement = '<span class="teleport-uline">\\1</span>';
+  return eregi_replace($pattern, $replacement, $haystack);
+}

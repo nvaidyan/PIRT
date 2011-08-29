@@ -1,0 +1,13 @@
+name = Calendar Signup
+description = Add signup forms in an event.module calendar
+package = Event
+dependencies[]  = event
+dependencies[]  = signup
+core = 6.x
+
+; Information added by drupal.org packaging script on 2011-07-06
+version = "6.x-2.x-dev"
+core = "6.x"
+project = "event"
+datestamp = "1309954414"
+

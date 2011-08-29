@@ -1,0 +1,45 @@
+/* $Id: teleport.css,v 1.1.2.5 2008/03/05 22:05:09 incidentist Exp $ */
+/* CSS for teleport module */
+#teleport {
+  width: 30%;
+  top: 35%;
+  position: fixed;
+  left: 50%;
+  margin-left: -15%;
+  z-index: 10;
+  background-color: #FFF;
+}
+
+#teleport FIELDSET {
+  border-width: 5px;
+  padding: 1em;
+  margin: 0em;
+}
+
+#teleport #edit-teleport-title {
+  width: 95%;
+}
+
+#teleport #autocomplete ul li {
+  text-align: left;
+}
+
+#teleport .teleport-path {
+  color: gray;
+}
+
+#teleport .selected .teleport-path {
+  color: #FFF;
+}
+
+#teleport .teleport-uline {
+  text-decoration: underline;
+}
+
+#teleport-left-buttons {
+  float: left;
+}
+
+#teleport-right-buttons {
+  float: right;
+}

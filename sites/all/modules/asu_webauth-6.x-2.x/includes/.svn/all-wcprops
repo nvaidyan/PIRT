@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/!svn/ver/628/asudwa/branches/asu_webauth-6.x-2.x/includes
+END
+admin.inc
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/563/asudwa/branches/asu_webauth-6.x-2.x/includes/admin.inc
+END
+api.inc
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/628/asudwa/branches/asu_webauth-6.x-2.x/includes/api.inc
+END
+pages.inc
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/534/asudwa/branches/asu_webauth-6.x-2.x/includes/pages.inc
+END
+ldap.inc
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/533/asudwa/branches/asu_webauth-6.x-2.x/includes/ldap.inc
+END

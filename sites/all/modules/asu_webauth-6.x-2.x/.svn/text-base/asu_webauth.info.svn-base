@@ -1,0 +1,6 @@
+name = "ASU Webauth"
+description = "Provide login via Arizona State University's Webauth single sign-on framework."
+version = 6.x-2.x
+core = 6.x
+package = ASU
+project status url = http://webconsulting.asu.edu/fserver

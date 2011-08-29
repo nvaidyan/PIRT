@@ -1,0 +1,159 @@
+<?php
+
+/**
+ * @file
+ * Update file for the importexportapi module. All functions in this file are
+ * implementations of hook_update_N(), unless indicated otherwise.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function importexportapi_install() {
+  // Create tables
+  drupal_install_schema('importexportapi');
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function importexportapi_uninstall() {
+  // Drop tables
+  drupal_uninstall_schema('importexportapi');
+}
+
+
+/**
+ * Implementation of hook_schema().
+ */
+function importexportapi_schema() {
+  $schema['importexportapi_db_put_map'] = array(
+    'fields' => array(
+      'put_map_id' => array(
+        'type' => 'serial', 
+        'unsigned' => TRUE, 
+        'not null' => TRUE, 
+      ),
+      'put_id' => array(
+        'type' => 'int', 
+        'unsigned' => TRUE, 
+        'not null' => TRUE, 
+        'default' => 0),
+      'entity' => array(
+        'type' => 'varchar', 
+        'length' => 255, 
+        'not null' => TRUE, 
+        'default' => ''),
+      'field' => array(
+        'type' => 'varchar',
+        'length' => 255, 
+        'not null' => TRUE, 
+        'default' => ''),
+      'value_old' => array(
+        'type' => 'int', 
+        'unsigned' => TRUE, 
+        'not null' => TRUE, 
+        'default' => 0),
+      'value_new' => array(
+        'type' => 'int', 
+        'unsigned' => TRUE, 
+        'not null' => TRUE, 
+        'default' => 0)
+    ),
+    'indexes' => array(
+      'put_map_id' => array('put_map_id')
+    ),
+    'primary key' => array('put_id')
+  );
+  $schema['importexportapi_db_put_map_alt'] = array(
+    'fields' => array(
+      'put_map_alt_id' => array(
+        'type' => 'serial', 
+        'unsigned' => TRUE, 
+        'not null' => TRUE, 
+      ),
+      'put_id' => array(
+        'type' => 'int', 
+        'unsigned' => TRUE, 
+        'not null' => TRUE, 
+        'default' => 0),
+      'entity' => array(
+        'type' => 'varchar',
+        'length' => 255, 
+        'not null' => TRUE, 
+        'default' => ''),
+      'field' => array(
+        'type' => 'varchar',
+        'length' => 255, 
+        'not null' => TRUE, 
+        'default' => ''),
+      'alt_field' => array(
+        'type' => 'varchar',
+        'length' => 255,  
+        'not null' => TRUE, 
+        'default'),
+      'value_alt' => array(
+        'type' => 'varchar',
+        'length' => 255, 
+        'not null' => TRUE, 
+        'default' => 0),
+      'value_key' => array(
+        'type' => 'int', 
+        'unsigned' => TRUE, 
+        'not null' => TRUE, 
+        'default' => 0)
+    ),
+    'indexes' => array(
+      'put_id' => array('put_id')
+    ),
+    'primary key' => array('put_map_alt_id')
+  );
+  return $schema;
+}
+
+function importexportapi_update_1() {
+  $ret = array();
+
+  db_add_field($ret, 'db_put_map_alt', 'put_map_alt_id', array(
+    'type' => 'serial',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+    ));
+  db_add_field($ret, 'db_put_map_alt', 'put_id', array(
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+    'default' => 0,
+  ));
+  db_add_field($ret, 'db_put_map_alt', 'entity', array(
+    'type' => 'varchar',
+    'not null' => TRUE,
+    'default',
+  ));
+  db_add_field($ret, 'db_put_map_alt', 'field', array(
+    'type' => 'varchar',
+    'not null' => TRUE,
+    'default'
+  ));
+  db_add_field($ret, 'db_put_map_alt', 'alt_field', array(
+    'type' => 'varchar',
+    'not null' => TRUE,
+    'default'
+  ));
+  db_add_field($ret, 'db_put_map_alt', 'value_alt', array(
+    'type' => 'varchar',
+    'not null' => TRUE,
+    'default' => 0,
+  ));
+  db_add_field($ret, 'db_put_map_alt', 'value_key', array(
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+    'default' => 0,
+  ));
+  db_add_index($ret, 'db_put_map_alt', 'put_map_alt_id', array(
+    'put_map_alt_id'
+  ));
+
+  return $ret;;
+}

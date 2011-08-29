@@ -1,0 +1,743 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Import / Export API Reference</title>
+<style type="text/css">
+h2 {
+  border-bottom: 100% dashed 1px;
+}
+h3 {
+  background-color: #dfedf7;
+}
+td {
+  text-align: center;
+}
+.help {
+  background-color: #ffc;
+}
+.x {
+  background-color: #dfedf7;
+}
+.verified {
+  background-color: #CFC;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Import / Export API Reference</h1>
+
+<p>This document provides a programmer's reference to the Drupal Import / Export API. If you're interested in step-by-step documentation to help you utilise the API, please see the <a href="#link-to-quickstart-goes-here">Import / Export API QuickStart guide</a>.</p>
+
+<p>See also the reference guides for the bundled engines:</p>
+
+<ul>
+<li><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference_db.html">db engines</a></li>
+<li><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference_csv.html">csv engines</a></li>
+<li><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference_xml.html">xml engines</a></li>
+</ul>
+
+<p>Skip to: <a href="#properties">Properties</a> | <a href="#fields">Field types</a></p>
+
+<h2>Fields and properties matrix</h2>
+
+<p><strong>Legend:</strong><br />
+
+<strong>X</strong> = property can be used with this field type<br />
+<strong>-</strong> = this property is not applicable to this field type</p>
+
+<table border="1">
+  <tr>
+    <th scope="col"><a href="#type"><strong>#type</strong></a></th>
+    <th scope="col"><a href="#array">array</a></th>
+
+    <th scope="col"><a href="#datetime">datetime</a></th>
+    <th scope="col"><a href="#entity">entity</a></th>
+    <th scope="col"><a href="#file">file</a></th>
+    <th scope="col"><a href="#float">float</a></th>
+    <th scope="col"><a href="#freeform">freeform</a></th>
+    <th scope="col"><a href="#int">int</a></th>
+
+    <th scope="col"><a href="#serialized">serialized</a></th>
+    <th scope="col"><a href="#string">string</a></th>
+  </tr>
+  <tr>
+    <th scope="row"><a href="#alt_key_for">#alt_key_for</a></th>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+
+    <td class="x"><strong>X</strong></td>
+  </tr>
+  <tr>
+    <th scope="row"><a href="#alt_key_ignore">#alt_key_ignore</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+
+  </tr>
+  <tr>
+    <th scope="row"><a href="#default_value">#default_value</a></th>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#dependencies">#dependencies</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#generated">#generated</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#get">#get</a></th>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#id">#id</a></th>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#key">#key</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#key_component">#key_component</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#keys">#keys</a></th>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#parents">#parents</a></th>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#process">#process</a></th>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#processed_get">#processed_get</a></th>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#processed_put">#processed_put</a></th>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#put">#put</a></th>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#reference_delta">#reference_delta</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#reference_entity">#reference_entity</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#reference_field">#reference_field</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#reference_parent">#reference_parent</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#required">#required</a></th>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#source">#source</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#title">#title</a></th>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#type">#type</a></th>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#unique">#unique</a></th>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#value">#value</a></th>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+</table>
+
+<h2><a name="fields" id="fields"></a>Field types</h2>
+
+<h3><a name="array" id="array"></a>array</h3>
+
+<p><strong>Description</strong>: Container for one or more child fields. Array fields are used for grouping together fields that may have more than one instance, and that have a parent-child relationship with their parent entity or array. An array field can have either an entity field or another array field as its parent. An array field can have fields of any type, except for <a href="#entity">entity</a>, as its children.</p>
+<p><strong>Properties</strong>: <a href="#get">#get</a>, <a href="#id">#id</a>, <a href="#keys">#keys</a>, <a href="#parents">#parents</a>, <a href="#process">#process</a>, <a href="#processed_get">#processed_get</a>, <a href="#processed_put">#processed_put</a>, <a href="#put">#put</a>, <a href="#title">#title</a>, <a href="#type">#type</a>, <a href="#value">#value</a>.</p>
+
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_node.inc">importexportapi_node.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'revisions'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'array'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Revisions'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#db_default_table'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'node_revisions'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#xml_plural'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'revisions'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#xml_mapping'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'revision'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#csv_plural'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'node-revisions'<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="datetime" id="datetime"></a>datetime</h3>
+
+<p><strong>Description</strong>: A timestamp in standard UNIX timestamp format. The timestamp is converted to and from an RFC-2822 string representation when using most 'get' and 'put' formats (e.g. XML).</p>
+<p><strong>Properties</strong>: <a href="#default_value">#default_value</a>, <a href="#get">#get</a>, <a href="#id">#id</a>, <a href="#parents">#parents</a>, <a href="#process">#process</a>, <a href="#processed_get">#processed_get</a>, <a href="#processed_put">#processed_put</a>, <a href="#put">#put</a>, <a href="#required">#required</a>, <a href="#title">#title</a>, <a href="#type">#type</a>, <a href="#unique">#unique</a>, <a href="#value">#value</a>.</p>
+
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_user.inc">importexportapi_user.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'created'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'datetime'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Member&nbsp;since'</font><font color="#007700">)<br />);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="entity" id="entity"></a>entity</h3>
+
+<p><strong>Description</strong>: Top-level container for all other fields. Entity fields are used for grouping together fields that describe a single entity, and that may have more than one instance. An entity field cannot have a parent, and it can have fields of any type as its children.</p>
+<p><strong>Properties</strong>: <a href="#dependencies">#dependencies</a>, <a href="#get">#get</a>, <a href="#id">#id</a>, <a href="#keys">#keys</a>, <a href="#parents">#parents</a>, <a href="#process">#process</a>, <a href="#processed_get">#processed_get</a>, <a href="#processed_put">#processed_put</a>, <a href="#put">#put</a>, <a href="#source">#source</a>, <a href="#title">#title</a>, <a href="#type">#type</a>.</p>
+
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_node.inc">importexportapi_node.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'created'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'datetime'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Member&nbsp;since'</font><font color="#007700">)<br />);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="file" id="file"></a>file</h3>
+
+<p><strong>Description</strong>: A string specifying the path to a file. Currently, this field has no special behaviour to differentiate it from a regular string field. In future, this field will be used for assisting in automated file imports.</p>
+<p><strong>Properties</strong>: <a href="#default_value">#default_value</a>, <a href="#get">#get</a>, <a href="#id">#id</a>, <a href="#parents">#parents</a>, <a href="#process">#process</a>, <a href="#processed_get">#processed_get</a>, <a href="#processed_put">#processed_put</a>, <a href="#put">#put</a>, <a href="#required">#required</a>, <a href="#title">#title</a>, <a href="#type">#type</a>, <a href="#unique">#unique</a>, <a href="#value">#value</a>.</p>
+
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_system.inc">importexportapi_system.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'file_path'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'file'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'File&nbsp;path'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#db_field_unaliased'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'filepath'<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="float" id="float"></a>float</h3>
+
+<p><strong>Description</strong>: A real number (also known as a floating-point number).</p>
+<p><strong>Properties</strong>: <a href="#default_value">#default_value</a>, <a href="#get">#get</a>, <a href="#id">#id</a>, <a href="#parents">#parents</a>, <a href="#process">#process</a>, <a href="#processed_get">#processed_get</a>, <a href="#processed_put">#processed_put</a>, <a href="#put">#put</a>, <a href="#required">#required</a>, <a href="#title">#title</a>, <a href="#type">#type</a>, <a href="#unique">#unique</a>, <a href="#value">#value</a>.</p>
+
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="freeform" id="freeform"></a>freeform</h3>
+
+<p><strong>Description</strong>: A list in delimited string format. The string can be either line-delimited or comma-delimited. The list is converted to and from a tree structure when using some 'get' and 'put' formats (e.g. XML).</p>
+<p><strong>Properties</strong>: <a href="#default_value">#default_value</a>, <a href="#get">#get</a>, <a href="#id">#id</a>, <a href="#parents">#parents</a>, <a href="#process">#process</a>, <a href="#processed_get">#processed_get</a>, <a href="#processed_put">#processed_put</a>, <a href="#put">#put</a>, <a href="#required">#required</a>, <a href="#title">#title</a>, <a href="#type">#type</a>, <a href="#unique">#unique</a>, <a href="#value">#value</a>.</p>
+
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_user.inc">importexportapi_user.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'perm'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'freeform'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Permission&nbsp;list'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#default_value'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">NULL</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#xml_plural'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'permissions'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#csv_plural'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'permissions'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#db_table'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'permission'<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="int" id="int"></a>int</h3>
+
+<p><strong>Description</strong>: An integral number (also known as a whole number).</p>
+<p><strong>Properties</strong>: <a href="#alt_key_for">#alt_key_for</a>, <a href="#alt_key_ignore">#alt_key_ignore</a>, <a href="#default_value">#default_value</a>, <a href="#generated">#generated</a>, <a href="#get">#get</a>, <a href="#id">#id</a>, <a href="#key">#key</a>, <a href="#key_component">#key_component</a>, <a href="#parents">#parents</a>, <a href="#process">#process</a>, <a href="#processed_get">#processed_get</a>, <a href="#processed_put">#processed_put</a>, <a href="#put">#put</a>, <a href="#reference_delta">#reference_delta</a>, <a href="#reference_entity">#reference_entity</a>, <a href="#reference_field">#reference_field</a>, <a href="#reference_parent">#reference_parent</a>, <a href="#required">#required</a>, <a href="#title">#title</a>, <a href="#type">#type</a>, <a href="#unique">#unique</a>, <a href="#value">#value</a>.</p>
+
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_user.inc">importexportapi_user.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'uid'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'int'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'User&nbsp;ID'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#key'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#db_uses_sequences'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="serialized" id="serialized"></a>serialized</h3>
+
+<p><strong>Description</strong>: A PHP variable in serialized string format. The string is converted to and from a tree structure when using some 'get' and 'put' formats (e.g. XML).</p>
+<p><strong>Properties</strong>: <a href="#default_value">#default_value</a>, <a href="#get">#get</a>, <a href="#id">#id</a>, <a href="#parents">#parents</a>, <a href="#process">#process</a>, <a href="#processed_get">#processed_get</a>, <a href="#processed_put">#processed_put</a>, <a href="#put">#put</a>, <a href="#required">#required</a>, <a href="#title">#title</a>, <a href="#type">#type</a>, <a href="#unique">#unique</a>, <a href="#value">#value</a>.</p>
+
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_system.inc">importexportapi_system.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'value'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'serialized'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Variable&nbsp;value'</font><font color="#007700">)<br />);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="string" id="string"></a>string</h3>
+
+<p><strong>Description</strong>: A string of text. Note: this is the default field type if none is specified.</p>
+<p><strong>Properties</strong>: <a href="#alt_key_for">#alt_key_for</a>, <a href="#alt_key_ignore">#alt_key_ignore</a>, <a href="#default_value">#default_value</a>, <a href="#generated">#generated</a>, <a href="#get">#get</a>, <a href="#id">#id</a>, <a href="#key_component">#key_component</a>, <a href="#parents">#parents</a>, <a href="#process">#process</a>, <a href="#processed_get">#processed_get</a>, <a href="#processed_put">#processed_put</a>, <a href="#put">#put</a>, <a href="#reference_delta">#reference_delta</a>, <a href="#reference_entity">#reference_entity</a>, <a href="#reference_field">#reference_field</a>, <a href="#reference_parent">#reference_parent</a>, <a href="#required">#required</a>, <a href="#title">#title</a>, <a href="#type">#type</a>, <a href="#unique">#unique</a>, <a href="#value">#value</a>.</p>
+
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_user.inc">importexportapi_user.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'pass'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Password'</font><font color="#007700">)<br />);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h2><a name="properties" id="properties"></a>Properties</h2>
+
+<h3><a name="alt_key_for" id="alt_key_for"></a>#alt_key_for</h3>
+
+<p><strong>Used by</strong>: <a href="#int">int</a>, <a href="#string">string</a>.</p>
+<p><strong>Description</strong>: The name of the field for which this field is an alternate key. The field being named must be either a <a href="#key">#key</a> or a <a href="#key_component">#key_component</a> field. All fields with this property set are implicitly <a href="#unique">#unique</a>.</p>
+
+<p><strong>Values</strong>: A field name. The parents of the alternate key field cannot be specfied; instead, it is assumed that the alternate key field is a sibling of this field.</p>
+<p><strong>Default value</strong>: NULL</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_user.inc">importexportapi_user.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'name'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Username'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#alt_key_for'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'uid'<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="alt_key_ignore" id="alt_key_ignore"></a>#alt_key_ignore</h3>
+
+<p><strong>Used by</strong>: <a href="#int">int</a>, <a href="#string">string</a>.</p>
+<p><strong>Description</strong>: The names of alternate key fields (of the field that this field is referencing) that should NOT be copied and generated as siblings of this field. Should only be used by fields that specify a <a href="#reference_entity">#reference_entity</a>.</p>
+<p><strong>Values</strong>: Either an array of alternate key field names, or boolean TRUE to indicate all alternate key fields.</p>
+
+<p><strong>Default value</strong>: NULL</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_user.inc">importexportapi_user.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'auth'</font><font color="#007700">][</font><font color="#DD0000">'uid'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'int'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'User&nbsp;ID'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#reference_entity'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'user'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#alt_key_ignore'&nbsp;</font><font color="#007700">=&gt;&nbsp;array(</font><font color="#DD0000">'name'</font><font color="#007700">)<br />);<br /></font><font color="#0000BB">$def</font><font color="#007700">[</font><font color="#DD0000">'auth'</font><font color="#007700">][</font><font color="#DD0000">'authname'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Auth&nbsp;name'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#reference_entity'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'user'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#reference_field'&nbsp;</font><font color="#007700">=&gt;&nbsp;array(</font><font color="#DD0000">'name'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#alt_key_ignore'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="default_value" id="default_value"></a>#default_value</h3>
+
+<p><strong>Used by</strong>: ALL types except <a href="#entity">entity</a>, <a href="#array">array</a>.</p>
+<p><strong>Description</strong>: The value of the field that will be used if <a href="#value">#value</a> is NULL or undefined. Should NOT be confused with <a href="#value">#value</a>, which is the actual value that can be explicitly provided.</p>
+
+<p><strong>Values</strong>: Mixed.</p>
+<p><strong>Default value</strong>: Different for each field type.</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_node.inc">importexportapi_node.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'status'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'int'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Published'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#default_value'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">1<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="dependencies" id="dependencies"></a>#dependencies</h3>
+
+<p><strong>Used by</strong>: <a href="#entity">entity</a>.</p>
+<p><strong>Description</strong>: INTERNAL. The entities that this entity depends on. This is determined automatically, by looking for fields that reference other fields in other entities.</p>
+<p><strong>Values</strong>: Array of entity field names.</p>
+<p><strong>Default value</strong>: empty array</p>
+
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="generated" id="generated"></a>#generated</h3>
+
+<p><strong>Used by</strong>: <a href="#int">int</a>, <a href="#string">string</a>.</p>
+<p><strong>Description</strong>: INTERNAL. Indicates that this field is a computer-generated copy of an alternate key field.</p>
+<p><strong>Values</strong>: Boolean.</p>
+
+<p><strong>Default value</strong>: NULL</p>
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="get" id="get"></a>#get</h3>
+
+<p><strong>Used by</strong>: ALL</p>
+<p><strong>Description</strong>: INTERNAL. Contains engine-specific properties that have been configured for use in a 'get' operation. The properties inside are generally inherited from their equivalent top-level properties, unless they have been explicitly set. Although this property is internally generated, the properties inside it are considered public, and can (and should) be changed by other modules that utilise import / export API functionality.</p>
+<p><strong>Values</strong>: Mixed.</p>
+
+<p><strong>Default value</strong>: NULL</p>
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="id" id="id"></a>#id</h3>
+
+<p><strong>Used by</strong>: ALL</p>
+<p><strong>Description</strong>: INTERNAL. The field's id property, which is determined by the key of the field as declared in a data definition.</p>
+<p><strong>Values</strong>: String.</p>
+
+<p><strong>Default value</strong>: n/a</p>
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="key" id="key"></a>#key</h3>
+
+<p><strong>Used by</strong>: <a href="#int">int</a>.</p>
+<p><strong>Description</strong>: Specifies that this field is the unique, database-generated, integer identifier for the entity or array of which it is a part. A maximum of one field per entity or array can be a key field For example, if "x" is an entity, "y" is an array that is the child of "x", and "z" is an array that is the child of "y", then "x", "y", and "z" can each have a maximum of one key field. Should NOT be used by fields that specify a <a href="#reference_entity">#reference_entity</a>.</p>
+
+<p><strong>Values</strong>: Boolean.</p>
+<p><strong>Default value</strong>: NULL</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_node.inc">importexportapi_node.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'nid'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'int'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Node&nbsp;ID'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#key'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#db_uses_sequences'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="key_component" id="key_component"></a>#key_component</h3>
+
+<p><strong>Used by</strong>: <a href="#int">int</a>, <a href="#string">string</a>.</p>
+<p><strong>Description</strong>: Specifies that this field is one of the fields that makes up the unique identifier for the entity or array of which it is a part. The unique identifier for each entity or array consists of the <a href="#key">#key</a> field (if any), plus all key_component fields. If no <a href="#key">#key</a> field is specified for an entity or array, then at least one field must be a key_component.</p>
+
+<p><strong>Values</strong>: Boolean.</p>
+<p><strong>Default value</strong>: NULL</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_taxonomy.inc">importexportapi_taxonomy.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'parents'</font><font color="#007700">][</font><font color="#DD0000">'tid'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'int'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Term&nbsp;ID'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#reference_entity'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'term'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#alt_key_ignore'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#key_component'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="keys" id="keys"></a>#keys</h3>
+
+<p><strong>Used by</strong>: <a href="#entity">entity</a>, <a href="#array">array</a>.</p>
+<p><strong>Description</strong>: INTERNAL. The list of fields that make up the unique identifier for this entity or array field. This list consists of all <a href="#key">#key</a> or <a href="#key_component">#key_component</a> fields that are direct children of this field.</p>
+
+<p><strong>Values</strong>: Array of field names.</p>
+<p><strong>Default value</strong>: n/a</p>
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="parents" id="parents"></a>#parents</h3>
+
+<p><strong>Used by</strong>: ALL</p>
+<p><strong>Description</strong>: INTERNAL. The parents of the current field. This field is always an empty array for entities.</p>
+
+<p><strong>Values</strong>: Array of field names, in order from most distant parent to least distant (i.e. direct) parent.</p>
+<p><strong>Default value</strong>: empty array</p>
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="process" id="process"></a>#process</h3>
+
+<p><strong>Used by</strong>: ALL</p>
+<p><strong>Description</strong>: The callback functions to use when executing the 'process' hook on this field. The callback functions are executed in the order in which they are listed. Note: if this field is of a type that specifies a default set of callback functions, then all callback functions specified here will be <em>appended</em> to the default list, and will not <em>replace</em> the default list.</p>
+
+<p><strong>Values</strong>: Array of callback functions, in the form 'function_name' => array(<em>'arguments'</em>).</p>
+<p><strong>Default value</strong>: Different for each field type.</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_user.inc">importexportapi_user.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def&nbsp;</font><font color="#007700">=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'entity'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'User&nbsp;role'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#xml_plural'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'roles'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#csv_plural'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'roles'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#process'&nbsp;</font><font color="#007700">=&gt;&nbsp;array(</font><font color="#DD0000">'_importexportapi_user_process_role'&nbsp;</font><font color="#007700">=&gt;&nbsp;array())<br />);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="processed_get" id="processed_get"></a>#processed_get</h3>
+
+<p><strong>Used by</strong>: ALL</p>
+<p><strong>Description</strong>: INTERNAL. Indicates whether or not the 'process' hook has been executed for for this field during the current 'get' operation.</p>
+<p><strong>Values</strong>: Boolean.</p>
+<p><strong>Default value</strong>: NULL</p>
+<p><strong>Usage example</strong>: NONE</p>
+
+<h3><a name="processed_put" id="processed_put"></a>#processed_put</h3>
+
+<p><strong>Used by</strong>: ALL</p>
+<p><strong>Description</strong>: INTERNAL. Indicates whether or not the 'process' hook has been executed for for this field during the current 'put' operation.</p>
+<p><strong>Values</strong>: Boolean.</p>
+<p><strong>Default value</strong>: NULL</p>
+<p><strong>Usage example</strong>: NONE</p>
+
+<h3><a name="put" id="put"></a>#put</h3>
+
+<p><strong>Used by</strong>: ALL</p>
+<p><strong>Description</strong>: INTERNAL. Contains engine-specific properties that have been configured for use in a 'put' operation. The properties inside are generally inherited from their equivalent top-level properties, unless they have been explicitly set. Although this property is internally generated, the properties inside it are considered public, and can (and should) be changed by other modules that utilise import / export API functionality.</p>
+<p><strong>Values</strong>: Mixed.</p>
+<p><strong>Default value</strong>: NULL</p>
+<p><strong>Usage example</strong>: NONE</p>
+
+<h3><a name="reference_delta" id="reference_delta"></a>#reference_delta</h3>
+
+<p><strong>Used by</strong>: <a href="#int">int</a>, <a href="#string">string</a>.</p>
+<p><strong>Description</strong>: If separate instances of a particular entity or array are referenced by multiple fields that are children of the same entity or array, then each referencing field will need to set a different delta value. This allows for a separate join to be performed on each instance, when executing database queries on the entity or array that is the parent of this field.</p>
+<p><strong>Values</strong>: Integer (must be > 0).</p>
+<p><strong>Default value</strong>: NULL</p>
+
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_taxonomy.inc">importexportapi_taxonomy.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'parents'</font><font color="#007700">][</font><font color="#DD0000">'parent_tid'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'int'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Parent&nbsp;term&nbsp;ID'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#reference_entity'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'term'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#reference_field'&nbsp;</font><font color="#007700">=&gt;&nbsp;array(</font><font color="#DD0000">'tid'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#db_field_unaliased'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'parent'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#key_component'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#reference_delta'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">1</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#reference_parent'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">FALSE</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#alt_key_ignore'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="reference_entity" id="reference_entity"></a>#reference_entity</h3>
+
+<p><strong>Used by</strong>: <a href="#int">int</a>, <a href="#string">string</a>.</p>
+<p><strong>Description</strong>: The name of the entity that is the parent (direct or non-direct) of the field that this field is referencing. This is the only field that is required in order to define a field as a reference to another field.</p>
+<p><strong>Values</strong>: An entity field name.</p>
+<p><strong>Default value</strong>: NULL</p>
+
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_node.inc">importexportapi_node.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'uid'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'int'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'User&nbsp;ID'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#reference_entity'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'user'<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="reference_field" id="reference_field"></a>#reference_field</h3>
+
+<p><strong>Used by</strong>: <a href="#int">int</a>, <a href="#string">string</a>.</p>
+<p><strong>Description</strong>: The field that this field is referencing. Should only be used by fields that specify a <a href="#reference_entity">#reference_entity</a>. Defaults to the unique identifying name of this field. This property only needs to be specified if the unique identifying name of this field is different to the unique identifying name of the field being referenced, or if the field being referenced is not the direct child of an entity (i.e. if it is the direct child of an array).</p>
+<p><strong>Values</strong>: An array of field names, that consists of the names of all the parents of the referencing field (except for its parent entity), and the name of the referencing field itself, in order from the most distant parent to the actual referenced field.</p>
+
+<p><strong>Default value</strong>: NULL</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_user.inc">importexportapi_user.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'perm_rid'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'int'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Role&nbsp;ID'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#reference_entity'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'role'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#reference_field'&nbsp;</font><font color="#007700">=&gt;&nbsp;array(</font><font color="#DD0000">'rid'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#db_table'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'permission'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#db_field_unaliased'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'rid'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#key_component'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#csv_hidden'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="reference_parent" id="reference_parent"></a>#reference_parent</h3>
+
+<p><strong>Used by</strong>: <a href="#int">int</a>, <a href="#string">string</a>.</p>
+<p><strong>Description</strong>: Allows this field to NOT be a reference to a field within its parent's parent. By default, all fields that reference a field within the parent entity or array of their parent are used for parent-child linking. Setting this value to FALSE will reverse this behaviour, and will stop this field from being used for parent-child linking. This property should generally be used in conjunction with <a href="#reference_delta">#reference_delta</a>.</p>
+<p><strong>Values</strong>: Boolean.</p>
+
+<p><strong>Default value</strong>: NULL</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_taxonomy.inc">importexportapi_taxonomy.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'parents'</font><font color="#007700">][</font><font color="#DD0000">'parent_tid'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'int'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Parent&nbsp;term&nbsp;ID'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#reference_entity'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'term'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#reference_field'&nbsp;</font><font color="#007700">=&gt;&nbsp;array(</font><font color="#DD0000">'tid'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#db_field_unaliased'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'parent'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#key_component'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#reference_delta'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">1</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#reference_parent'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">FALSE</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#alt_key_ignore'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="required" id="required"></a>#required</h3>
+
+<p><strong>Used by</strong>: ALL types except <a href="#entity">entity</a>, <a href="#array">array</a>.</p>
+<p><strong>Description</strong>: Specifies that a field is required to have a value (other than its <a href="#default_value">#default_value</a>). Note: this is not currently enforced or validated in the API.</p>
+<p><strong>Values</strong>: Boolean.</p>
+
+<p><strong>Default value</strong>: FALSE</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_user.inc">importexportapi_user.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'auth'</font><font color="#007700">][</font><font color="#DD0000">'module'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Auth&nbsp;module'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#required'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="source" id="source"></a>#source</h3>
+
+<p><strong>Used by</strong>: <a href="#entity">entity</a>.</p>
+<p><strong>Description</strong>: The engine to be used for accessing the source of data for this entity.</p>
+<p><strong>Values</strong>: String.</p>
+<p><strong>Default value</strong>: db</p>
+
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="title" id="title"></a>#title</h3>
+
+<p><strong>Used by</strong>: ALL</p>
+<p><strong>Description</strong>: The title of the field. Make sure to enclose inside the <a href="http://api.drupal.org/t">t()</a> function so this property can be translated. Note: this is the only property that is required explicitly and universally, for all field types.</p>
+<p><strong>Values</strong>: String.</p>
+
+<p><strong>Default value</strong>: n/a</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_user.inc">importexportapi_user.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'pass'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Password'</font><font color="#007700">)<br />);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="type" id="type"></a>#type</h3>
+
+<p><strong>Used by</strong>: ALL</p>
+<p><strong>Description</strong>: Used to determine the type of field.</p>
+<p><strong>Values</strong>: String.</p>
+<p><strong>Default value</strong>: string</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_user.inc">importexportapi_user.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'created'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'int'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Member&nbsp;since'</font><font color="#007700">)<br />);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="unique" id="unique"></a>#unique</h3>
+
+<p><strong>Used by</strong>: ALL types except <a href="#entity">entity</a>, <a href="#array">array</a>.</p>
+<p><strong>Description</strong>: Used to determine if all instances of this field must be unique.</p>
+<p><strong>Values</strong>: Boolean.</p>
+<p><strong>Default value</strong>: NULL</p>
+
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_node.inc">importexportapi_node.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'vid'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'int'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Revision&nbsp;ID'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#reference_entity'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'node'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#reference_field'&nbsp;</font><font color="#007700">=&gt;&nbsp;array(</font><font color="#DD0000">'revisions'</font><font color="#007700">,&nbsp;</font><font color="#DD0000">'vid'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#unique'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="value" id="value"></a>#value</h3>
+
+<p><strong>Used by</strong>: ALL types except <a href="#entity">entity</a>.</p>
+<p><strong>Description</strong>: INTERNAL. This is where the actual values of a field are placed during a 'get' operation, and it is where they are retrieved from during a 'put' operation.</p>
+<p><strong>Values</strong>: Mixed.</p>
+<p><strong>Default value</strong>: NULL</p>
+
+<p><strong>Usage example</strong>: NONE</p>
+
+</body>
+</html>

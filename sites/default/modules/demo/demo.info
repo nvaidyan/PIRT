@@ -1,0 +1,5 @@
+; $Id$
+name = Demo Module
+description = A micro-module to implement the form_alter() hook for demo content type 
+core = 6.x
+package = ASU Physics Web Master

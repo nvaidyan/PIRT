@@ -1,0 +1,214 @@
+<?xml version="1.0"?>
+<drupal>
+  <roles>
+    <role>
+      <rid>1</rid>
+      <role-name>anonymous user</role-name>
+      <perm-rid>1</perm-rid>
+      <permissions>
+        <perm>access content</perm>
+      </permissions>
+      <perm-rid-role-name>anonymous user</perm-rid-role-name>
+    </role>
+    <role>
+      <rid>2</rid>
+      <role-name>authenticated user</role-name>
+      <perm-rid>2</perm-rid>
+      <permissions>
+        <perm>access comments</perm>
+        <perm>post comments</perm>
+        <perm>post comments without approval</perm>
+        <perm>access content</perm>
+      </permissions>
+      <perm-rid-role-name>authenticated user</perm-rid-role-name>
+    </role>
+    <role>
+      <rid>3</rid>
+      <role-name>commando</role-name>
+      <perm-rid>3</perm-rid>
+      <permissions>
+        <perm>access news feeds</perm>
+        <perm>administer news feeds</perm>
+        <perm>create book pages</perm>
+        <perm>create new books</perm>
+        <perm>edit book pages</perm>
+        <perm>edit own book pages</perm>
+      </permissions>
+      <perm-rid-role-name>commando</perm-rid-role-name>
+    </role>
+    <role>
+      <rid>4</rid>
+      <role-name>president</role-name>
+      <perm-rid>4</perm-rid>
+      <permissions>
+        <perm>administer forums</perm>
+        <perm>create forum topics</perm>
+        <perm>edit own forum topics</perm>
+        <perm>administer menu</perm>
+      </permissions>
+      <perm-rid-role-name>president</perm-rid-role-name>
+    </role>
+  </roles>
+  <profile-fields>
+    <profile-field>
+      <fid>1</fid>
+      <title>Country</title>
+      <field-name>profile_country</field-name>
+      <type>selection</type>
+      <category>Personal information</category>
+      <options>
+        <option>Australia</option>
+        <option>United Kingdom</option>
+        <option>United States</option>
+        <option>Uzbekistan</option>
+      </options>
+      <weight>0</weight>
+      <visibility>2</visibility>
+      <required>0</required>
+      <register>0</register>
+    </profile-field>
+    <profile-field>
+      <fid>2</fid>
+      <title>Name</title>
+      <field-name>profile_name</field-name>
+      <type>textfield</type>
+      <category>Personal information</category>
+      <weight>-3</weight>
+      <visibility>2</visibility>
+      <required>0</required>
+      <register>0</register>
+    </profile-field>
+    <profile-field>
+      <fid>3</fid>
+      <title>Hobbies</title>
+      <field-name>profile_hobbies</field-name>
+      <type>list</type>
+      <category>Personal information</category>
+      <weight>0</weight>
+      <visibility>2</visibility>
+      <required>0</required>
+      <register>0</register>
+    </profile-field>
+    <profile-field>
+      <fid>4</fid>
+      <title>Date of birth</title>
+      <field-name>profile_dob</field-name>
+      <type>date</type>
+      <category>Personal information</category>
+      <weight>0</weight>
+      <visibility>2</visibility>
+      <required>0</required>
+      <register>0</register>
+    </profile-field>
+  </profile-fields>
+  <users>
+    <user>
+      <uid>2</uid>
+      <name>Bobby</name>
+      <pass>08d15a4aef553492d8971cdd5198f314</pass>
+      <mail>bob@byy.com</mail>
+      <created>Wed, 16 Aug 2006 01:39:40 +1000</created>
+      <access>Wed, 16 Aug 2006 01:39:40 +1000</access>
+      <login>Thu, 31 Aug 2006 00:00:00 +1000</login>
+      <status>1</status>
+      <timezone>0</timezone>
+      <roles>
+        <role>
+          <rid>3</rid>
+          <role-name>commando</role-name>
+        </role>
+      </roles>
+      <mode>0</mode>
+      <sort>0</sort>
+      <profile-values>
+        <profile>
+          <fid>1</fid>
+          <value>United States</value>
+          <title>Country</title>
+          <field-name>profile_country</field-name>
+        </profile>
+        <profile>
+          <fid>2</fid>
+          <value>Bobby Bo</value>
+          <title>Name</title>
+          <field-name>profile_name</field-name>
+        </profile>
+        <profile>
+          <fid>3</fid>
+          <values>
+            <value>frogging</value>
+            <value>painting</value>
+          </values>
+          <title>Hobbies</title>
+          <field-name>profile_hobbies</field-name>
+        </profile>
+        <profile>
+          <fid>4</fid>
+          <value>
+            <day>16</day>
+            <month>8</month>
+            <year>1997</year>
+          </value>
+          <title>Date of birth</title>
+          <field-name>profile_dob</field-name>
+        </profile>
+      </profile-values>
+    </user>
+    <user>
+      <uid>3</uid>
+      <name>Kate</name>
+      <pass>08d15a4aef553492d8971cdd5198f314</pass>
+      <mail>kate@waa.com</mail>
+      <created>Wed, 16 Aug 2006 01:40:38 +1000</created>
+      <access>Wed, 16 Aug 2006 01:40:38 +1000</access>
+      <login>Thu, 31 Aug 2006 00:00:00 +1000</login>
+      <status>1</status>
+      <timezone>0</timezone>
+      <roles>
+        <role>
+          <rid>3</rid>
+          <role-name>commando</role-name>
+        </role>
+        <role>
+          <rid>4</rid>
+          <role-name>president</role-name>
+        </role>
+      </roles>
+      <mode>0</mode>
+      <sort>0</sort>
+      <profile-values>
+        <profile>
+          <fid>3</fid>
+          <values>
+            <value>sewing</value>
+            <value>shooting camels</value>
+          </values>
+          <title>Hobbies</title>
+          <field-name>profile_hobbies</field-name>
+        </profile>
+        <profile>
+          <fid>2</fid>
+          <value>Katie Smith</value>
+          <title>Name</title>
+          <field-name>profile_name</field-name>
+        </profile>
+        <profile>
+          <fid>1</fid>
+          <value>Uzbekistan</value>
+          <title>Country</title>
+          <field-name>profile_country</field-name>
+        </profile>
+        <profile>
+          <fid>4</fid>
+          <value>
+            <day>11</day>
+            <month>11</month>
+            <year>2002</year>
+          </value>
+          <title>Date of birth</title>
+          <field-name>profile_dob</field-name>
+        </profile>
+      </profile-values>
+    </user>
+  </users>
+</drupal>

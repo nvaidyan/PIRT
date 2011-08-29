@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Import / Export API Reference: xml engines</title>
+<style type="text/css">
+h2 {
+  border-bottom: 100% dashed 1px;
+}
+h3 {
+  background-color: #dfedf7;
+}
+td {
+  text-align: center;
+}
+.help {
+  background-color: #ffc;
+}
+.x {
+  background-color: #dfedf7;
+}
+.verified {
+  background-color: #CFC;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Import / Export API Reference: xml engines</h1>
+
+<p>This document provides a programmer's reference to the <em>xml get</em> and <em>xml put</em> engines of the Drupal Import / Export API. For an explanation of the field types and their core properties, see the main <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html">Import / Export API reference</a> document.</p>
+<p>Skip to: <a href="#properties">Properties</a></p>
+
+<h2>Fields and properties matrix</h2>
+
+<p><strong>Legend:</strong><br />
+<strong>X</strong> = property can be used with this field type<br />
+<strong>-</strong> = this property is not applicable to this field type</p>
+
+<table border="1">
+  <tr>
+    <th scope="col"><a href="#type"><strong>#type</strong></a></th>
+
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#array">array</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#datetime">datetime</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#entity">entity</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#file">file</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#float">float</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#freeform">freeform</a></th>
+
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#int">int</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#serialized">serialized</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#string">string</a></th>
+  </tr>
+  <tr>
+    <th scope="row"><a href="#xml_hidden">#xml_hidden</a></th>
+    <td>-</td>
+
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+  <tr>
+    <th scope="row"><a href="#xml_mapping">#xml_mapping</a></th>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+  </tr>
+  <tr>
+    <th scope="row"><a href="#xml_plural">#xml_plural</a></th>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+  </tr>
+</table>
+
+<h2><a name="properties" id="properties"></a>Properties</h2>
+
+<h3><a name="xml_hidden" id="xml_hidden"></a>#xml_hidden</h3>
+
+<p><strong>Used by</strong>: ALL types except <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#entity">entity</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#array">array</a>.</p>
+
+<p><strong>Description</strong>: When set to TRUE, indicates that this field should not be outputted during an xml 'put' operation.</p>
+<p><strong>Values</strong>: Boolean.</p>
+<p><strong>Default value</strong>: NULL</p>
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="xml_mapping" id="xml_mapping"></a>#xml_mapping</h3>
+
+<p><strong>Used by</strong>: ALL</p>
+
+<p><strong>Description</strong>: The XML tag name for this field. During a 'put' operation, the value of this field will be wrapped in a tag with this name; and during a 'get' operation, the system will search for tags with this name. For field types that contain multiple values, this name applies to the tags that enclose each individual value; this should NOT be confused with the <a href="#xml_plural">#xml_plural</a> property, which applies to tags that enclose multiple values.</p>
+<p><strong>Values</strong>: A valid XML tag name. <strong>Note:</strong> this value must be different to the value of the XML tags that will become this field's respective direct parent and direct child (as well as siblings). For example, if this field is an array, then both the <a href="#xml_plural">#xml_plural</a> value of this field, and the <a href="#xml_mapping">#xml_mapping</a> value (or, where applicable, the <a href="#xml_plural">#xml_plural</a> value) of this field's direct children, must be different to the value of this property for this field.</p>
+
+<p><strong>Default value</strong>: inherited from the <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#id">#id</a> property of this field.</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_node.inc">importexportapi_node.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'revisions'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'array'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Revisions'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#db_default_table'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'node_revisions'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#xml_plural'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'revisions'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#xml_mapping'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'revision'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#csv_plural'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'node-revisions'<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="xml_plural" id="xml_plural"></a>#xml_plural</h3>
+
+<p><strong>Used by</strong>: <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#entity">entity</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#array">array</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#freeform">freeform</a>.</p>
+<p><strong>Description</strong>: The XML tag name for a collection of values for this field. During a 'put' operation, the collection of values for this field will be wrapped in a tag with this name; and during a 'get' operation, the system will search for tags with this name. This property should NOT be confused with the <a href="#xml_mapping">#xml_mapping</a> property, which applies to the tags that enclose each individual value, and which also applies to all field types.</p>
+
+<p><strong>Values</strong>: A valid XML tag name. <strong>Note:</strong> this value must always be different to the value of <a href="#xml_mapping">#xml_mapping</a>, in any field for which both of these properties apply. If this field has a parent field, then the <a href="#xml_mapping">#xml_mapping</a> value for the parent field should also be different to this property for this field. Additionally, this property should be unique for all sibling fields.</p>
+<p><strong>Default value</strong>: inherited from the <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#id">#id</a> property of this field.</p>
+
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_node.inc">importexportapi_node.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def&nbsp;</font><font color="#007700">=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'entity'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Node'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#db_default_table'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'node'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#xml_plural'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'nodes'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#csv_plural'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'nodes'<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+</body>
+</html>

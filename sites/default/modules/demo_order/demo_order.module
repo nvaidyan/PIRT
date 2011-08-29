@@ -1,0 +1,25 @@
+<?php
+// $Id$
+
+/**
+* @file
+* A micro module to form alter
+*
+* Removes unnecessary fields from demo order submission
+*/
+function demo_order_form_alter(&$form, $form_state, $form_id) {
+  // hide extraneous options in the node form for nodetype nodes
+  if($form_id == 'demo_order_node_form') {
+    $form['path']['#access'] = FALSE;
+    $form['menu']['#access'] = FALSE;
+    $form['author']['#access'] = FALSE;
+    $form['options']['#access'] = FALSE;
+    $form['comment_settings']['#access'] = FALSE;
+    $form['revision_information']['#access'] = FALSE;
+    // Change title of ID Card add page
+    drupal_set_title(t('Demo Order Form'));
+    //quash the date field since we want to use the event module's date
+    $form['field_date']['#type'] = 'hidden';
+    $form['buttons']['submit']['#value'] = t('Submit');
+  }
+}

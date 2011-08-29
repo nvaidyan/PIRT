@@ -1,0 +1,244 @@
+<?xml version="1.0"?>
+<drupal>
+  <vocabularies>
+    <vocabulary>
+      <vocabulary-name>Forums</vocabulary-name>
+      <relations>0</relations>
+      <hierarchy>1</hierarchy>
+      <multiple>0</multiple>
+      <required>1</required>
+      <tags>0</tags>
+      <module>forum</module>
+      <weight>0</weight>
+      <types>
+        <type>
+          <type-name>forum</type-name>
+        </type>
+      </types>
+    </vocabulary>
+    <vocabulary>
+      <vocabulary-name>Tags</vocabulary-name>
+      <help>Type some tags.</help>
+      <relations>0</relations>
+      <hierarchy>1</hierarchy>
+      <multiple>1</multiple>
+      <required>0</required>
+      <tags>0</tags>
+      <module>taxonomy</module>
+      <weight>0</weight>
+      <types>
+        <type>
+          <type-name>story</type-name>
+        </type>
+      </types>
+    </vocabulary>
+  </vocabularies>
+  <terms>
+    <term>
+      <term-name>romance</term-name>
+      <weight>0</weight>
+      <parents>
+        <parent-instance>
+          <parent-term-name>emotion</parent-term-name>
+        </parent-instance>
+      </parents>
+      <vocabulary-name>Tags</vocabulary-name>
+    </term>
+    <term>
+      <term-name>emotion</term-name>
+      <weight>0</weight>
+      <vocabulary-name>Tags</vocabulary-name>
+    </term>
+    <term>
+      <term-name>froggie</term-name>
+      <weight>0</weight>
+      <parents>
+        <parent-instance>
+          <parent-term-name>amphibian</parent-term-name>
+        </parent-instance>
+      </parents>
+      <vocabulary-name>Tags</vocabulary-name>
+    </term>
+    <term>
+      <term-name>amphibian</term-name>
+      <weight>0</weight>
+      <vocabulary-name>Tags</vocabulary-name>
+    </term>
+  </terms>
+  <stories>
+    <story>
+      <type>story</type>
+      <title>Being a frog</title>
+      <status>1</status>
+      <created>Wed, 16 Aug 2006 02:49:54 +1000</created>
+      <changed>Wed, 16 Aug 2006 02:49:54 +1000</changed>
+      <promote>1</promote>
+      <moderate>0</moderate>
+      <sticky>0</sticky>
+      <revisions>
+        <revision>
+          <title-revision>Being a frog</title-revision>
+          <body>Not as easy as it *rrrrreebbbbbbitttt* looks.</body>
+          <teaser>Not as easy as it *rrrrreebbbbbbitttt* looks.</teaser>
+          <timestamp>Wed, 16 Aug 2006 02:49:54 +1000</timestamp>
+          <name>TestAdmin</name>
+          <mail>info@greenash.net.au</mail>
+          <format-name>Filtered HTML</format-name>
+        </revision>
+      </revisions>
+      <comment>2</comment>
+      <last-comment-timestamp>Wed, 16 Aug 2006 02:49:54 +1000</last-comment-timestamp>
+      <comment-count>0</comment-count>
+      <totalcount>0</totalcount>
+      <daycount>0</daycount>
+      <viewed>0</viewed>
+      <taxonomy-terms>
+        <term>
+          <term-name>amphibian</term-name>
+        </term>
+        <term>
+          <term-name>froggie</term-name>
+        </term>
+      </taxonomy-terms>
+      <title-revision>Being a frog</title-revision>
+      <name>TestAdmin</name>
+      <mail>info@greenash.net.au</mail>
+      <comment-statistics-nid-title>Being a frog</comment-statistics-nid-title>
+      <last-comment-uid-name>TestAdmin</last-comment-uid-name>
+      <last-comment-uid-mail>info@greenash.net.au</last-comment-uid-mail>
+      <counter-nid-title>Being a frog</counter-nid-title>
+    </story>
+    <story>
+      <type>story</type>
+      <title>Love</title>
+      <status>1</status>
+      <created>Wed, 16 Aug 2006 02:50:15 +1000</created>
+      <changed>Wed, 16 Aug 2006 02:50:15 +1000</changed>
+      <promote>1</promote>
+      <moderate>0</moderate>
+      <sticky>0</sticky>
+      <revisions>
+        <revision>
+          <title-revision>Love</title-revision>
+          <body>Is overrated.</body>
+          <teaser>Is overrated.</teaser>
+          <timestamp>Wed, 16 Aug 2006 02:50:15 +1000</timestamp>
+          <name>TestAdmin</name>
+          <mail>info@greenash.net.au</mail>
+          <format-name>Filtered HTML</format-name>
+        </revision>
+      </revisions>
+      <comment>2</comment>
+      <last-comment-timestamp>Thu, 31 Aug 2006 13:43:21 +1000</last-comment-timestamp>
+      <comment-count>3</comment-count>
+      <totalcount>0</totalcount>
+      <daycount>0</daycount>
+      <viewed>0</viewed>
+      <taxonomy-terms>
+        <term>
+          <term-name>emotion</term-name>
+        </term>
+        <term>
+          <term-name>romance</term-name>
+        </term>
+      </taxonomy-terms>
+      <title-revision>Love</title-revision>
+      <name>TestAdmin</name>
+      <mail>info@greenash.net.au</mail>
+      <comment-statistics-nid-title>Love</comment-statistics-nid-title>
+      <last-comment-uid-name>TestAdmin</last-comment-uid-name>
+      <last-comment-uid-mail>info@greenash.net.au</last-comment-uid-mail>
+      <counter-nid-title>Love</counter-nid-title>
+    </story>
+    <story>
+      <type>story</type>
+      <title>Cucumbers</title>
+      <status>1</status>
+      <created>Tue, 29 Aug 2006 12:40:53 +1000</created>
+      <changed>Tue, 29 Aug 2006 12:40:53 +1000</changed>
+      <promote>1</promote>
+      <moderate>0</moderate>
+      <sticky>0</sticky>
+      <revisions>
+        <revision>
+          <title-revision>Cucumbers</title-revision>
+          <body>Are interesting vegie-tables.</body>
+          <teaser>Are interesting vegie-tables.</teaser>
+          <timestamp>Tue, 29 Aug 2006 12:40:53 +1000</timestamp>
+          <format>1</format>
+          <name>TestAdmin</name>
+          <mail>info@greenash.net.au</mail>
+          <format-name>Filtered HTML</format-name>
+        </revision>
+      </revisions>
+      <comment>2</comment>
+      <last-comment-timestamp>Tue, 29 Aug 2006 12:40:53 +1000</last-comment-timestamp>
+      <comment-count>0</comment-count>
+      <totalcount>0</totalcount>
+      <daycount>0</daycount>
+      <viewed>0</viewed>
+      <taxonomy-terms>
+        <term>
+          <term-name>froggie</term-name>
+        </term>
+        <term>
+          <term-name>romance</term-name>
+        </term>
+      </taxonomy-terms>
+      <title-revision>Cucumbers</title-revision>
+      <name>TestAdmin</name>
+      <mail>info@greenash.net.au</mail>
+      <comment-statistics-nid-title>Cucumbers</comment-statistics-nid-title>
+      <last-comment-uid-name>TestAdmin</last-comment-uid-name>
+      <last-comment-uid-mail>info@greenash.net.au</last-comment-uid-mail>
+      <counter-nid-title>Cucumbers</counter-nid-title>
+    </story>
+  </stories>
+  <comments>
+    <comment>
+      <subject>riiite</subject>
+      <body>rg ehrthrthtr</body>
+      <hostname>127.0.0.1</hostname>
+      <timestamp>Thu, 31 Aug 2006 13:43:21 +1000</timestamp>
+      <score>0</score>
+      <status>0</status>
+      <thread>00.00/</thread>
+      <commenter-name>TestAdmin</commenter-name>
+      <parent-subject>ahhhh</parent-subject>
+      <title>Love</title>
+      <name>TestAdmin</name>
+      <mail>info@greenash.net.au</mail>
+      <format-name>Filtered HTML</format-name>
+    </comment>
+    <comment>
+      <subject>totally</subject>
+      <body>yeh</body>
+      <hostname>0</hostname>
+      <timestamp>Wed, 30 Aug 2006 13:49:23 +1000</timestamp>
+      <score>0</score>
+      <status>0</status>
+      <thread>00/</thread>
+      <commenter-name>TestAdmin</commenter-name>
+      <parent-subject>totally</parent-subject>
+      <title>Love</title>
+      <name>TestAdmin</name>
+      <mail>info@greenash.net.au</mail>
+      <format-name>Filtered HTML</format-name>
+    </comment>
+    <comment>
+      <subject>ahhhh</subject>
+      <body>i see</body>
+      <hostname>0</hostname>
+      <timestamp>Wed, 30 Aug 2006 17:28:10 +1000</timestamp>
+      <score>0</score>
+      <status>0</status>
+      <thread>00/</thread>
+      <commenter-name>TestAdmin</commenter-name>
+      <parent-subject>ahhhh</parent-subject>
+      <title>Love</title>
+      <name>TestAdmin</name>
+      <mail>info@greenash.net.au</mail>
+      <format-name>Filtered HTML</format-name>
+    </comment>
+  </comments>
+</drupal>

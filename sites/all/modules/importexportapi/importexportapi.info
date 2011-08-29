@@ -1,0 +1,11 @@
+name = Import Export API
+description = Allows data entities in Drupal to be imported and exported in a variety of formats.
+package = Import Export API
+core = 6.x
+
+; Information added by drupal.org packaging script on 2011-02-25
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "importexportapi"
+datestamp = "1298619439"
+

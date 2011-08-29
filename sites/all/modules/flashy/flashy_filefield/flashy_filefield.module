@@ -1,0 +1,76 @@
+<?php
+// $Id: flashy_filefield.module,v 1.1.2.1 2009/04/16 21:47:57 crell Exp $
+
+/**
+ * Implementation of hook_theme().
+ */
+function flashy_filefield_theme() {
+  return array(
+    'flashy_filefield_formatter_videoplayer' => array(
+      'arguments' => array('element' => NULL),
+    ),
+    'flashy_filefield_formatter_videoplaylist' => array(
+      'arguments' => array('element' => NULL),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_field_formatter_info().
+ */
+function flashy_filefield_field_formatter_info() {
+  return array(
+    'videoplayer' => array(
+      'label' => t('As Flash video'),
+      'field types' => array('filefield'),
+      'multiple values' => CONTENT_HANDLE_MODULE,
+    ),
+    'videoplaylist' => array(
+      'label' => t('As Flash video playlist'),
+      'field types' => array('filefield'),
+      'multiple values' => CONTENT_HANDLE_CORE,
+    ),
+  );
+}
+
+/**
+ * Theme a file as a flash video file to be played using Flashy.
+ *
+ * @ingroup themeable
+ */
+function theme_flashy_filefield_formatter_videoplayer($element) {
+  $output = '';
+
+  if (!count(element_children($element))) {
+    return '';
+  }
+
+  $flashy = flashy_create();
+  $flashy->noFlash($element[0]['#item']['data']['description']);
+
+  foreach (element_children($element) as $key) {
+    if (!empty($element[$key]['#item']['filepath'])) {
+      $flashy->addMedia($element[$key]['#item']['filepath']);
+    }
+  }
+  $output .= $flashy->render();
+
+  return $output;
+}
+
+/**
+ * Theme a file as a flash video playlist to be played using Flashy.
+ *
+ * @ingroup themeable
+ */
+function theme_flashy_filefield_formatter_videoplaylist($element) {
+  $output = '';
+
+  $flashy = flashy_create()
+    ->setPlaylist($element['#item']['filepath'])
+    ->noFlash(check_plain($element['#item']['data']['description']));
+
+  $output .= $flashy->render();
+
+  return $output;
+}

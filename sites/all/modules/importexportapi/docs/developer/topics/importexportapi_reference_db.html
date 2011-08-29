@@ -1,0 +1,497 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Import / Export API Reference: db engines</title>
+<style type="text/css">
+h2 {
+  border-bottom: 100% dashed 1px;
+}
+h3 {
+  background-color: #dfedf7;
+}
+td {
+  text-align: center;
+}
+.help {
+  background-color: #ffc;
+}
+.x {
+  background-color: #dfedf7;
+}
+.verified {
+  background-color: #CFC;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Import / Export API Reference: db engines</h1>
+
+<p>This document provides a programmer's reference to the <em>db get</em> and <em>db put</em> engines of the Drupal Import / Export API. For an explanation of the field types and their core properties, see the main <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html">Import / Export API reference</a> document.</p>
+<p>Skip to: <a href="#properties">Properties</a></p>
+
+<h2>Fields and properties matrix</h2>
+
+<p><strong>Legend:</strong><br />
+<strong>X</strong> = property can be used with this field type<br />
+<strong>-</strong> = this property is not applicable to this field type</p>
+
+<table border="1">
+  <tr>
+    <th scope="col"><a href="#type"><strong>#type</strong></a></th>
+
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#array">array</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#datetime">datetime</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#entity">entity</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#file">file</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#float">float</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#freeform">freeform</a></th>
+
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#int">int</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#serialized">serialized</a></th>
+    <th scope="col"><a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#string">string</a></th>
+  </tr>
+  <tr>
+    <th scope="row"><a href="#db_default_table">#db_default_table</a></th>
+    <td class="x"><strong>X</strong></td>
+
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <th scope="row"><a href="#db_do_query">#db_do_query</a></th>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+  </tr>
+  <tr>
+    <th scope="row"><a href="#db_field">#db_field</a></th>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+
+  </tr>
+  <tr>
+    <th scope="row"><a href="#db_field_unaliased">#db_field_unaliased</a></th>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#db_filter">#db_filter</a></th>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#db_force_generate_id">#db_force_generate_id</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#db_generate_id">#db_generate_id</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#db_is_insert">#db_is_insert</a></th>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#db_keys">#db_keys</a></th>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#db_reference_delta">#db_reference_delta</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#db_reference_field">#db_reference_field</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#db_reference_field_unaliased">#db_reference_field_unaliased</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#db_reference_parent">#db_reference_parent</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#db_reference_table">#db_reference_table</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#db_resolved_alt_key">#db_resolved_alt_key</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#db_table">#db_table</a></th>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+    <td class="x"><strong>X</strong></td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#db_update_existing">#db_update_existing</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#db_uses_sequences">#db_uses_sequences</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+
+  <tr>
+    <th scope="row"><a href="#db_value_old">#db_value_old</a></th>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+
+    <td>-</td>
+    <td>-</td>
+    <td class="x"><strong>X</strong></td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+
+</table>
+
+<h2><a name="properties" id="properties"></a>Properties</h2>
+
+<h3><a name="db_default_table" id="db_default_table"></a>#db_default_table</h3>
+
+<p><strong>Used by</strong>: <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#entity">entity</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#array">array</a>.</p>
+<p><strong>Description</strong>: The default value to assign to the <a href="#db_table">#db_table</a> property for all direct children of this field. This value is not assigned to child fields if they explicitly define their <a href="#db_table">#db_table</a> property.</p>
+
+<p><strong>Values</strong>: An unprefixed database table name. The table name must be one that is defined through <code>hook_db_def_tables()</code>.</p>
+<p><strong>Default value</strong>: inherited from the <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#id">#id</a> property of this field.</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_user.inc">importexportapi_user.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def&nbsp;</font><font color="#007700">=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'entity'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'User'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#db_default_table'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'users'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#xml_plural'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'users'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#csv_plural'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'users'<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="db_do_query" id="db_do_query"></a>#db_do_query</h3>
+
+<p><strong>Used by</strong>: <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#entity">entity</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#array">array</a>.</p>
+<p><strong>Description</strong>: INTERNAL. Indicates whether or not the query for this entity or array should be prepared and executed.</p>
+<p><strong>Values</strong>: Boolean.</p>
+<p><strong>Default value</strong>: TRUE</p>
+
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="db_field" id="db_field"></a>#db_field</h3>
+
+<p><strong>Used by</strong>: ALL types except <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#entity">entity</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#array">array</a>.</p>
+<p><strong>Description</strong>: The field name that should be used when retrieving this field in database queries. This is different to <a href="#db_field_unaliased">#db_field_unaliased</a>, in that it does not have to correspond to the actual name of the field in the database. Every direct child of an entity or array field should have a unique value for this property and for the <a href="#db_reference_field">#db_reference_field</a> property.</p>
+
+<p><strong>Values</strong>: A database field querying name.</p>
+<p><strong>Default value</strong>: inherited from the <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#id">#id</a> property of this field.</p>
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="db_field_unaliased" id="db_field_unaliased"></a>#db_field_unaliased</h3>
+
+<p><strong>Used by</strong>: ALL types except <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#entity">entity</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#array">array</a>.</p>
+
+<p><strong>Description</strong>: The name of this field in the database. Should NOT be confused with <a href="#db_field">#db_field</a>, which is the name used to query this field in the database.</p>
+<p><strong>Values</strong>: A database field name.</p>
+<p><strong>Default value</strong>: inherited from the <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#id">#id</a> property of this field.</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_user.inc">importexportapi_user.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'perm_rid'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'int'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Role&nbsp;ID'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#reference_entity'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'role'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#reference_field'&nbsp;</font><font color="#007700">=&gt;&nbsp;array(</font><font color="#DD0000">'rid'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#db_table'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'permission'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#db_field_unaliased'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'rid'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#key_component'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#csv_hidden'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="db_filter" id="db_filter"></a>#db_filter</h3>
+
+<p><strong>Used by</strong>: ALL types except <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#entity">entity</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#array">array</a>.</p>
+<p><strong>Description</strong>: A filtering rule to be applied to this field when querying it from the database. The rule has a special syntax which is represented as a simple array.</p>
+<p><strong>Values</strong>: An optional 'operator' property (defaults to 'eq'), which can be 'eq', 'neq', or any valid SQL comparison operator; and a 'values' property, which can be an array of values (each of the correct type) when 'operator' is 'eq' or 'neq', or else whatever value is appropriate for the 'operator' value that is being used.</p>
+<p><strong>Default value</strong>: NULL</p>
+
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_block.inc">importexportapi_block.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$defs</font><font color="#007700">[</font><font color="#DD0000">'block'</font><font color="#007700">][</font><font color="#DD0000">'module'</font><font color="#007700">][</font><font color="#DD0000">'#db_filter'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'values'&nbsp;</font><font color="#007700">=&gt;&nbsp;array(</font><font color="#DD0000">'block'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'operator'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'neq'<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="db_force_generate_id" id="db_force_generate_id"></a>#db_force_generate_id</h3>
+
+<p><strong>Used by</strong>: <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#int">int</a>.</p>
+<p><strong>Description</strong>: When set to TRUE, forces a new value to be generated for this field (from the database) during a db 'put' operation, even if one was already provided. Should generally be used in combination with the <a href="#db_generate_id">#db_generate_id</a> property. Only applies to fields with a <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#key">#key</a> value of TRUE.</p>
+
+<p><strong>Values</strong>: Boolean.</p>
+<p><strong>Default value</strong>: NULL</p>
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="db_generate_id" id="db_generate_id"></a>#db_generate_id</h3>
+
+<p><strong>Used by</strong>: <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#int">int</a>.</p>
+
+<p><strong>Description</strong>: When set to TRUE, indicates that a new value is to be generated for this field (from the database) during a db 'put' operation, if none has been provided. Only applies to fields with a <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#key">#key</a> value of TRUE.</p>
+<p><strong>Values</strong>: Boolean.</p>
+<p><strong>Default value</strong>: TRUE</p>
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="db_is_insert" id="db_is_insert"></a>#db_is_insert</h3>
+
+<p><strong>Used by</strong>: <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#entity">entity</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#array">array</a>.</p>
+<p><strong>Description</strong>: INTERNAL. Indicates whether the query for this entity or array is to be an SQL INSERT or UPDATE query.</p>
+<p><strong>Values</strong>: Boolean.</p>
+<p><strong>Default value</strong>: TRUE</p>
+
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="db_keys" id="db_keys"></a>#db_keys</h3>
+
+<p><strong>Used by</strong>: <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#entity">entity</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#array">array</a>.</p>
+<p><strong>Description</strong>: INTERNAL. The list of database fields that make up the unique identifier for this entity or array field. This list always consists of the <a href="#db_field_unaliased">#db_field_unaliased</a> values for each field in the <a href="#keys">#keys</a> property of this field.</p>
+
+<p><strong>Values</strong>: Array of database field names.</p>
+<p><strong>Default value</strong>: n/a</p>
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="db_reference_delta" id="db_reference_delta"></a>#db_reference_delta</h3>
+
+<p><strong>Used by</strong>: <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#int">int</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#string">string</a>.</p>
+
+<p><strong>Description</strong>: If separate instances of a particular entity or array are referenced by multiple fields that are children of the same entity or array, then each referencing field will need to set a different delta value. This allows for a separate join to be performed on each instance, when executing database queries on the entity or array that is the parent of this field.</p>
+<p><strong>Values</strong>: Integer (must be > 0).</p>
+<p><strong>Default value</strong>: inherited from the <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#reference_delta">#reference_delta</a> value of this field.</p>
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="db_reference_field" id="db_reference_field"></a>#db_reference_field</h3>
+
+<p><strong>Used by</strong>: <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#int">int</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#string">string</a>.</p>
+<p><strong>Description</strong>: The field name that should be used when retrieving the field that this field is referencing in database queries. This is different to <a href="#db_reference_field_unaliased">#db_reference_field_unaliased</a>, in that it does not have to correspond to the actual name of the referenced field in the database. Every direct child of an entity or array field should have a unique value for this property and for the <a href="#db_field">#db_field</a> property. Only applies to fields with a non-empty <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#reference_entity">#reference_entity</a> value.</p>
+
+<p><strong>Values</strong>: A database field querying name.</p>
+<p><strong>Default value</strong>: inherited from the <a href="#db_field">#db_field</a> property of the field that this field is referencing.</p>
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="db_reference_field_unaliased" id="db_reference_field_unaliased"></a>#db_reference_field_unaliased</h3>
+
+<p><strong>Used by</strong>: <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#int">int</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#string">string</a>.</p>
+
+<p><strong>Description</strong>: The name of the field that this field is referencing in the database. Should NOT be confused with <a href="#db_reference_field">#db_reference_field</a>, which is the name used to query the referenced field in the database. Only applies to fields with a non-empty <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#reference_entity">#reference_entity</a> value.</p>
+<p><strong>Values</strong>: A database field name.</p>
+<p><strong>Default value</strong>: inherited from the <a href="#db_field_unaliased">#db_field_unaliased</a> property of the field that this field is referencing.</p>
+
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="db_reference_parent" id="db_reference_parent"></a>#db_reference_parent</h3>
+
+<p><strong>Used by</strong>: <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#int">int</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#string">string</a>.</p>
+<p><strong>Description</strong>: Allows this field to NOT be a reference to a field within its parent's parent. By default, all fields that reference a field within the parent entity or array of their parent are used for parent-child linking. Setting this value to FALSE will reverse this behaviour, and will stop this field from being used for parent-child linking. This property should generally be used in conjunction with <a href="#db_reference_delta">#db_reference_delta</a>.</p>
+
+<p><strong>Values</strong>: Boolean.</p>
+<p><strong>Default value</strong>: inherited from the <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#reference_parent">#reference_parent</a> value of this field.</p>
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="db_reference_table" id="db_reference_table"></a>#db_reference_table</h3>
+
+<p><strong>Used by</strong>: <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#int">int</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#string">string</a>.</p>
+
+<p><strong>Description</strong>: The name of the database table for the field that this field is referencing. Only applies to fields with a non-empty <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#reference_entity">#reference_entity</a> value.</p>
+<p><strong>Values</strong>: An unprefixed database table name. The table name must be one that is defined through <code>hook_db_def_tables()</code>.</p>
+<p><strong>Default value</strong>: inherited from the <a href="#db_table">#db_table</a> property of the field that this field is referencing.</p>
+
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="db_resolved_alt_key" id="db_resolved_alt_key"></a>#db_resolved_alt_key</h3>
+
+<p><strong>Used by</strong>: <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#int">int</a>.</p>
+<p><strong>Description</strong>: INTERNAL. Stores the database name of the alternate key field that was used to resolve this field during a db 'put' operation (if any).</p>
+<p><strong>Values</strong>: A database field querying name.</p>
+
+<p><strong>Default value</strong>: NULL</p>
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="db_table" id="db_table"></a>#db_table</h3>
+
+<p><strong>Used by</strong>: ALL types except <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#entity">entity</a>, <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#array">array</a>.</p>
+<p><strong>Description</strong>: The name of the database table for this field. Should NOT be confused with <a href="#db_field">#db_field</a>, which is the name used to query this field in the database.</p>
+
+<p><strong>Values</strong>: An unprefixed database table name. The table name must be one that is defined through <code>hook_db_def_tables()</code>.</p>
+<p><strong>Default value</strong>: inherited from the <a href="#db_default_table">#db_default_table</a> property of this field's direct parent entity or array.</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_user.inc">importexportapi_user.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'perm'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'freeform'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'Permission&nbsp;list'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#default_value'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">NULL</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#xml_plural'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'permissions'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#csv_plural'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'permissions'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#db_table'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'permission'<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="db_update_existing" id="db_update_existing"></a>#db_update_existing</h3>
+
+<p><strong>Used by</strong>: <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#int">int</a>.</p>
+<p><strong>Description</strong>: When set to TRUE, indicates that existing database entries that match this field should be updated (rather than new entries being inserted, and old entries left as-is) during a db 'put' operation, if existing entries can be found. Only applies to fields with a <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#key">#key</a> or <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#key_component">#key_component</a> value of TRUE, or with a non-empty <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#reference_entity">#reference_entity</a> value.</p>
+
+<p><strong>Values</strong>: Boolean.</p>
+<p><strong>Default value</strong>: TRUE</p>
+<p><strong>Usage example</strong>: NONE</p>
+<h3><a name="db_uses_sequences" id="db_uses_sequences"></a>#db_uses_sequences</h3>
+
+<p><strong>Used by</strong>: <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#int">int</a>.</p>
+
+<p><strong>Description</strong>: When set to TRUE, indicates that Drupal's custom database sequencing system (i.e. the 'sequences table' system) should be used when generating a new value for this field, instead of relying on in-built database sequencing / incrementing. Only applies to fields with a <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#key">#key</a> value of TRUE.</p>
+<p><strong>Values</strong>: Boolean.</p>
+<p><strong>Default value</strong>: NULL</p>
+<p><strong>Usage example</strong>: (<a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/definitions/importexportapi_user.inc">importexportapi_user.inc</a>):</p>
+
+<div class="codeblock"><code><font color="#000000"><font color="#0000BB">&lt;?php<br />$def</font><font color="#007700">[</font><font color="#DD0000">'uid'</font><font color="#007700">]&nbsp;=&nbsp;array(<br />&nbsp; </font><font color="#DD0000">'#type'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#DD0000">'int'</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#title'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">t</font><font color="#007700">(</font><font color="#DD0000">'User&nbsp;ID'</font><font color="#007700">),<br />&nbsp; </font><font color="#DD0000">'#key'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE</font><font color="#007700">,<br />&nbsp; </font><font color="#DD0000">'#db_uses_sequences'&nbsp;</font><font color="#007700">=&gt;&nbsp;</font><font color="#0000BB">TRUE<br /></font><font color="#007700">);<br /></font><font color="#0000BB">?&gt;</font></font></code></div>
+
+<h3><a name="db_value_old" id="db_value_old"></a>#db_value_old</h3>
+
+<p><strong>Used by</strong>: <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#int">int</a>.</p>
+<p><strong>Description</strong>: INTERNAL. Stores the original value of this field during a db 'put' operation, in case a new value was database-generated for this field.</p>
+<p><strong>Values</strong>: Integer.</p>
+<p><strong>Default value</strong>: inherited from the <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#value">#value</a> property of this field. Only applies to fields with a <a href="http://cvs.drupal.org/viewcvs/*checkout*/drupal/contributions/modules/importexportapi/docs/developer/topics/importexportapi_reference.html#key">#key</a> value of TRUE.</p>
+
+<p><strong>Usage example</strong>: NONE</p>
+
+</body>
+</html>

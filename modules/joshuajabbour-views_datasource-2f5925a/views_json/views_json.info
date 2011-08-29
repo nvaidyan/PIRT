@@ -1,0 +1,7 @@
+; $Id: views_json.info,v 1.1.2.2 2010/01/28 06:53:40 allisterbeharry Exp $
+name = Views JSON
+description = "Views style plugin to render node content as JSON."
+package = Views
+core = 6.x
+dependencies[] = views
+php = 5.1

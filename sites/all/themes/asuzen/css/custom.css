@@ -1,0 +1,380 @@
+
+/**
+*  Title: ASU Zen Theme (Gold)
+*  Copyright: (c) 2008 Arizona State University
+*  Author: Jeff Beeman, Kathy Marks, Nathan Gudmunson 
+*  Description: Custom style rules to override asuzen.css 
+*  Edited by Nick Vaidyanathan 08/02/2010 for styles for Nanoscience Physics website, based on Physics standards
+*/
+
+* {
+	font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
+	margin: 0;
+	padding: 0;
+	white-space: normal;
+}
+
+/* overwrite asuzen theming because we don't like them! */
+#main, #header-blocks, #closure-blocks {
+    font-family: Tahoma,Verdana,Arial,Helvetica,sans-serif;
+    margin: 0;
+	background-color: #f0f2f1;
+	opacity: 0.95;
+	font-size: .85em;
+    padding: 0;
+    white-space: normal;
+}
+
+#navbar {
+	font-family: Tahoma,Verdana,Arial,Helvetica,sans-serif;
+    margin: 0;
+	background-color: #f0f2f1;
+	font-size: .85em;
+    padding: 0;
+    white-space: normal;
+}
+
+/* no borders on tables per gary's request */
+table, tr, td, th {
+   border: none;
+}
+
+/* dirty hack to fix problems with nice menus http://drupal.org/node/575040 */
+.block-inner
+{
+  position:relative;
+  z-index:999;
+}
+/*clean up tables emitted by Views and other junk per discussion with Gary Childress on 3/25/2011 */
+th {
+   background-color:#960032;
+   color:white;
+}
+
+h3 {
+  border-bottom: 2px solid black;
+  font-weight: bolder;
+  line-height: 1.33em;
+  margin: 1.06em 0pt 0.625em;
+  padding: 5px 0pt;
+  text-transform: none;
+  letter-spacing: 0px;
+  color: #000000;
+  font-size: 100%;
+}
+
+h2 {
+margin: 0;
+}
+
+/* per bob's req that internal function should be black and not h2 1/14/2011 */
+.block .title, .gradient-backing 
+{
+   font-size:100%;
+   font-weight:bold;
+   color:white;
+   padding-left:5%;
+   background: #960032;  /* for non-css3 browsers */
+   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='black', endColorstr='#960032'); /* for IE */
+   background: -webkit-gradient(linear, left  top, left bottom, from(black), to(#960032)); /* for webkit browsers */
+   background: -moz-linear-gradient(left,  black,  #960032); /* for firefox 3.6+ */
+}
+
+/* added to make some nice spacing for publications list */
+.views-row {
+   margin: 5px;
+}
+/* added to make Physics logo appear like original image */
+.cufon
+{
+   margin-top: 7px;
+   font-size:  12pt;
+}
+body {
+	/* for older browsers that don't support rgba */
+	background: #A4A9AB url(../images/watermark.jpg) no-repeat;
+	background-attachment: fixed;
+	background-position: left top;
+	opacity: 0.95;
+    filter: alpha(opacity=95);
+    filter: "alpha(opacity=95)";
+	z-index: -1;
+}
+
+.front-page-right 
+{
+   padding-top:10px;
+}
+
+.asu_set_fixed_width {
+	width: 1000px;
+	margin-left: auto;
+	margin-right: auto;
+	background-color: #fff;
+}
+
+#asu_container {
+	/* here solely to turn overflow y:hidden off from layout.css, which annoys me */
+	overflow-y:visible;
+	overflow-x:visible;
+}
+
+/**
+* END FIXED WIDTH
+*/
+
+#asu_gold_hdr {
+	position: relative;
+	z-index: 3;
+}
+#header-blocks {
+  background: #000000 none repeat scroll left center;
+}
+
+.header {
+   background-color: #000;
+   position:relative;
+   text-align:left;
+   width:100%;
+   font-size:28pt;
+}
+
+.header a:link,.header a:visited {
+	color:#FFCB66;
+}
+
+#main-inner {
+   background:url(../images/grayAtom.jpg) no-repeat scroll 0 120px #F0F2F2;
+   left:0;
+   margin:0;
+   padding:0;
+   position:relative;
+   top:0;
+}
+
+/* here to make some nice spacing between nav and inner content. May also fix overflow issues */
+#content-inner {
+   margin:0px 20px;
+}
+#content-inner table {
+   overflow:auto;
+}
+
+ul.menu li {
+	font-weight: bold;
+	color: black;
+	line-height: 1.75;
+	font-size: 97.36%;
+}
+ul.menu {
+	padding-bottom: 0;
+}
+
+ul.menu a {
+	color: #000000;
+	display: block;
+}
+
+ul.menu a:hover, ul.menu a.active {
+	color: white;
+	text-decoration: none;
+	background: #82888A;
+	display: block;
+}
+
+.block li.leaf, ul.menu li.leaf {
+	list-style-type: none;
+	list-style-image: url(../images/menu-collapsed.gif);
+}
+.block li.active, ul.menu li.active {
+	list-style-type: none;
+	list-style-image: url(../images/menu-expanded.gif);
+}
+/* End LEFT NAV */
+/*  MENU BACKGROUND STYLES  */
+/* End MENU BACKGROUND STYLES */
+
+.breadcrumb {
+	padding-top: 6px;
+}
+
+a:link, a:visited {
+	color: #990033;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+
+h1.title {
+	background: transparent;
+	color: #990033;
+	padding: 0;
+}
+
+#site-slogan{
+	font-size:2em;
+	font-style:italic;
+	font-weight:bolder;
+}
+
+div[class=node-inner] .raised-image {
+   margin: 5px 10px;
+   float:right;
+   border-radius:10px;
+   /* drop shadow per http://robertnyman.com/2010/03/16/drop-shadow-with-css-for-all-web-browsers/ */
+	-moz-box-shadow: 5px 5px 7px #000;
+	-webkit-box-shadow: 5px 5px 7px #000;
+	box-shadow: 5px 5px 7px #000;
+	/* For IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#000000')";
+	/* For IE 5.5 - 7 */
+	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#000000');
+}
+
+#applyRotation {
+  border: 1px black solid;
+  width: 33%;
+  background-color:gold;
+  text-align: center;
+}
+
+#applyRotation span
+{
+  font-size:12pt;
+  color:#000;
+}
+
+#applyRotation a {
+  background-color:white;
+  color:maroon;
+  width:100%;
+}
+
+#apply, #universityInfo {
+  margin-top:15%;
+}
+
+.applicationButton {
+   font-size:150%;
+   font-weight:bolder;
+   color: #ffffff;
+   text-shadow: 1px 1px 1px #000;
+   /* gradient color */
+   background-image: -moz-linear-gradient(0%, 100px 90deg, #fac832, #fbd972);
+   background-image: -webkit-gradient(linear, 0% 0%, 0% 70%, from(#fac832), to(#fbd972));
+   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='gold', endColorstr='yellow'); /* for IE */
+   -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='gold', endColorstr='yellow')"; /* for IE */
+   /* border radius */
+   -moz-border-radius-bottomleft:4px;
+   -moz-border-radius-bottomright:4px;
+   -webkit-border-bottom-left-radius:4px;
+   -webkit-border-bottom-right-radius:4px;
+   border-bottom-left-radius:4px;
+   border-bottom-right-radius:4px;
+   /* box shadow */
+   background-color: rgba(0,0,0,0.8);
+   -moz-box-shadow:2px 2px 2px rgba(0,0,0,0.8);
+   -webkit-box-shadow:2px 2px 2px rgba(0,0,0,0.8);
+   box-shadow: 2px 2px 2px rgba(0,0,0,0.8);
+   /* For IE 8 */
+   -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#000000')";
+   /* For IE 5.5 - 7 */
+   filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#000000');
+   /* black magic from eyeballing */
+   width:30%;
+   height:150%;
+   text-align: center;
+}
+
+.seminar {
+   text-align: center;
+}
+
+.series-info  div, .seminar-info .field-field-name, .seminar-info .field-field-other-affiliations {
+   font-weight:bold;
+   font-size: 150%;
+   padding: 1%;
+}
+
+.description {
+    color: #000000;
+}
+
+label, .views-field-field-degree-info-value, .views-field-field-title-value
+{
+   font-weight:bold;
+   font-size:larger;
+   margin: 2px 2px 2px 2px;
+}
+
+#biophysics, #astrophysics, #nanophysics {
+   margin-top:2%;
+   margin-bottom:25%;
+}
+
+#invest, #friends {
+   margin-top:2%;
+   margin-bottom:10%;
+}
+
+.clear-block {
+  display:block;
+}
+
+.field-field-semester-reference div, .field-field-seminar-type div {
+	padding: 0%;
+}
+
+#mission {
+	background-color: #F0F2F2;
+}
+
+#pirtHeader {
+   color: #FFCB66;
+   font-size:95%;
+}
+
+#pirtHeader span {
+   color:red;
+   font-size:80%;
+   position:relative;
+   right:-150px;
+}
+
+.rotating-slideshow {
+	margin-left:160px;
+	width:760px;
+	z-index: -9999px
+	text-align: center;
+}
+
+.views-field-field-catalog-value {
+	text-align: center;
+}
+
+#name-and-slogan {
+	padding: .5em .5em .5em 0;
+}
+
+#sidebar-left{
+	padding-left: .5em;
+}
+
+#block-search-0{
+	padding-bottom:.5em;
+}
+
+#frontpagelinks {
+	font-size: 24px;
+	text-align: center;
+}
+
+.inventory-list {
+   overflow:auto;
+}
+
+.block-nice_menus {
+	opacity: 1;
+}
+

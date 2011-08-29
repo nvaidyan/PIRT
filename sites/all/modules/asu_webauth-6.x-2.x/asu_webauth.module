@@ -1,0 +1,427 @@
+<?php
+// $Id$
+
+
+/**
+ * @file
+ * Provide ASU Webauth integration for user authentication into Drupal.
+ *
+ * This file contains standard Drupal page callbacks.
+ *
+ * @author Jeff Beeman: jeff.beeman@asu.edu
+ * @version 6.x-2.x-dev
+ * @see README.txt
+ *   For installation and setup instructions
+ * @see TODO.org
+ *   For outstanding tasks
+ *
+ * @todo Coder module review.
+ */
+
+
+define('ASU_WEBAUTH_MODULE_API_VERSION', 2.0);
+define('ASU_WEBAUTH_HOST', 'webauth.asu.edu');
+define('ASU_WEBAUTH_PORT', 3001);
+define('ASU_WEBAUTH_TIMEOUT', 45);
+define('ASU_WEBAUTH_LOGIN_URL', 'https://weblogin.asu.edu/cgi-bin/login');
+define('ASU_WEBAUTH_CHANGE_PW_URL', 'https://selfsub.asu.edu/lostpassword');
+define('ASU_WEBAUTH_REGISTER_URL', 'http://asu.edu/asuriterequest');
+define('ASU_WEBAUTH_DEBUG', variable_get('asu_webauth_debug', FALSE));
+
+
+// Load the API
+module_load_include('inc', 'asu_webauth', 'includes/api');
+
+if (variable_get('asu_webauth_show_ldap_name', FALSE) && function_exists('ldap_search')) {
+  module_load_include('inc', 'asu_webauth', 'includes/ldap');
+}
+
+
+/**
+ * Implementation of hook_menu().
+ */
+function asu_webauth_menu() {
+  $items = array();
+  $items['admin/settings/asu_webauth'] = array(
+    'title' => 'ASU Webauth',
+    'description' => 'Settings for webauth behavior.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('asu_webauth_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'includes/admin.inc',
+  );
+  $items['asuwebauth'] = array(
+    'page callback' => 'asu_webauth_attempt',
+    'access callback' => 'asu_webauth_menu_access',
+    'access arguments' => array('login-silent'),
+    'file' => 'includes/pages.inc',
+    'type' => MENU_CALLBACK,
+  );
+  $items['asuwebauth-login'] = array(
+    'page callback' => 'asu_webauth_redirect',
+    'page arguments' => array(TRUE),
+    'access callback' => 'asu_webauth_menu_access',
+    'access arguments' => array('login-force'),
+    'file' => 'includes/pages.inc',
+    'type' => MENU_CALLBACK,
+  );
+  $items['asuwebauth-logout'] = array(
+    'page callback' => 'asu_webauth_logout',
+    'access callback' => 'asu_webauth_menu_access',
+    'access arguments' => array('logout'),
+    'file' => 'includes/pages.inc',
+    'type' => MENU_CALLBACK,
+  );
+  $items['asuwebauth/redirect'] = array(
+    'page callback' => 'asu_webauth_redirect',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  $items['asuwebauth/noauth'] = array(
+    'page callback' => 'asu_webauth_noauth',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/pages.inc',
+  );
+  $items['admin/user/user/add-asuwebauth'] = array(
+    'title' => 'Add ASU User',
+    'description' => 'Quickly add an ASU user based on ASURITE ID.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('asu_webauth_add_user_form'),
+    'access arguments' => array('administer users'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'includes/pages.inc',
+  );
+  return $items;
+}
+
+
+/**
+ * Implementation of hook_menu_alter().
+ */
+function asu_webauth_menu_alter(&$items) {
+  $path = drupal_get_path('module', 'asu_webauth') .'/includes';
+
+  // Alter the user register link
+  $items['user/register']['page callback'] = 'asu_webauth_user_register';
+  $items['user/register']['module'] = 'asu_webauth';
+  $items['user/register']['file'] = 'includes/pages.inc';
+
+  // Alter the change password link
+  $items['user/password']['page callback'] = 'asu_webauth_user_password';
+  $items['user/password']['module'] = 'asu_webauth';
+  $items['user/password']['file'] = 'includes/pages.inc';
+}
+
+
+/**
+ * Menu access callback.
+ */
+function asu_webauth_menu_access($case) {
+  global $user;
+
+  if ($user->uid && user_access('administer menu') && strpos($_GET['q'], 'admin/build/menu') !== FALSE) {
+    return TRUE;
+  }
+
+  // Logging in with a silent attempt at retrieving an authenticator
+  if ($case == 'login-silent') {
+    if ($user->uid || $_SESSION['asu_webauth_noauth']) {
+      return FALSE;
+    }
+    else {
+      return TRUE;
+    }
+  }
+  // Loggin in and forcing user to a login screen if they don't have an authenticator
+  if ($case == 'login-force') {
+    if ($user->uid) {
+      return FALSE;
+    }
+    else {
+      return TRUE;
+    }
+  }
+  // Logout
+  if ($case == 'logout') {
+    if ($user->uid || (isset($_COOKIE['ASUWEBAUTH']) && $_COOKIE['ASUWEBAUTH'])) {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+
+/**
+ * Implementation of hook_init().
+ */
+function asu_webauth_init() {
+  global $user;
+  asu_webauth_css_js();
+
+  // Don't try to authenticate in certain cases
+  if (asu_webauth_skip()) {
+    if (ASU_WEBAUTH_DEBUG) {
+      drupal_set_message(t('ASU Webauth: Skip authentication.'));
+    }
+    return;
+  }
+
+  asu_webauth_override_ini();
+
+  // OOP issue here, so we set the noauth session var if we need to
+  if ($_GET['q'] == 'asuwebauth/noauth' || ($_SESSION['asu_webauth_attempting_to_auth'] && !$_GET['authenticator'])) {
+    $_SESSION['asu_webauth_noauth'] = TRUE;
+    $_SESSION['asu_webauth_attempting_to_auth'] = FALSE;
+  }
+
+  // If we fail to retrieve an authenticator, but need one
+  if ($_GET['q'] == 'asuwebauth' && !$_GET['authenticator'] && !$user->uid && !$_SESSION['asu_webauth_tried_discrete']) {
+    drupal_set_message(t('Failed to retrieve authenticator. This is usually because your site is not on the list of allowed ASU Webauth hosts. In order to add your site to this list, please email webconsulting@asu.edu.'), 'error');
+  }
+
+  // If we haven't tried to authenticate, silently do so now
+  if (
+        !stristr($_GET['q'], 'asuwebauth')
+        && !$_SESSION['asu_webauth_noauth']
+        && !$user->uid
+        && !$_SESSION['asu_webauth_attempting_to_auth']
+  ) {
+    $_SESSION['asu_webauth_attempting_to_auth'] = TRUE;
+    $_SESSION['asu_webauth_noauth'] = FALSE;
+    $_SESSION['asu_webauth_cookie'] = $_COOKIE['ASUWEBAUTH'];
+    asu_webauth_redirect();
+  }
+
+  // If we've already tried to authenticate, but now the ASUWEBAUTH cookie has been changed, redo the attempt to authenticate
+  if (
+        !stristr($_GET['q'], 'asuwebauth')
+        && !$user->uid
+        && !$_SESSION['asu_webauth_attempting_to_auth']
+        && isset($_COOKIE['ASUWEBAUTH'])
+        && $_SESSION['asu_webauth_cookie'] != $_COOKIE['ASUWEBAUTH']
+  ) {
+    if (ASU_WEBAUTH_DEBUG) {
+      drupal_set_message(t('ASU Webauth: Webauth cookie has changed, re-attempting to authenticate.'));
+    }
+    $_SESSION['asu_webauth_cookie'] = $_COOKIE['ASUWEBAUTH'];
+    $_SESSION['asu_webauth_noauth'] = FALSE;
+    asu_webauth_redirect();
+  }
+
+  // Check to see if we need to force login based on admin settings
+  if (!$user->uid && asu_webauth_check_force_login()) {
+    // If we're not attempting to authenticate already, and if the user hasn't already failed to authenticate
+    if (!$_SESSION['asu_webauth_attempting_to_auth'] && !$_SESSION['asu_webauth_noauth']) {
+      $_SESSION['asu_webauth_attempting_to_auth'] = TRUE;
+
+      asu_webauth_redirect(TRUE);
+    }
+    // If we've discretely tried to authenticate, but haven't tried to force authenticate
+    elseif ($_SESSION['asu_webauth_tried_discrete'] && !$_SESSION['asu_webauth_tried_forced']) {
+      $_SESSION['asu_webauth_attempting_to_auth'] = TRUE;
+      asu_webauth_redirect(TRUE);
+    }
+    // If we haven't even tried to discretely authenticate
+    elseif (!$_SESSION['asu_webauth_tried_discrete']) {
+      $_SESSION['asu_webauth_attempting_to_auth'] = TRUE;
+      asu_webauth_redirect(TRUE);
+    }
+    else {
+      // If the user isn't authenticated, we just let Drupal handle what to do next. Any other action is a little to heavy handed.
+      // From drupal_goto() - not used here due to the way it alters the destination URL
+      if (!defined('MAINTENANCE_MODE') || MAINTENANCE_MODE != 'update') {
+        module_invoke_all('exit', $url);
+      }
+      session_write_close();
+    }
+  }
+
+  // Verify the authenticator is still valid
+  $roles = variable_get('asu_webauth_auto_assigned_role', array(DRUPAL_AUTHENTICATED_RID));
+  $matches = array_intersect_key($roles, $user->roles);
+  if (variable_get('asu_webauth_verify_always', TRUE) && $user->uid && count($matches)) {
+    asu_webauth_verify_or_logout();
+  }
+}
+
+
+/**
+ * If we're doing webauth stuff, ensure some ini settings are enforcing the security we want.
+ */
+function asu_webauth_override_ini() {
+  ini_set('session.cache_expire', 60);
+  ini_set('session.cookie_lifetime', 0);
+  ini_set('session.gc_maxlifetime', 3600);
+  ini_set('session.use_cookies', 1);
+  ini_set('session.use_only_cookies', 1);
+}
+
+
+/**
+ * Check to see if we should skip running webauth checks.
+ * i.e. Don't do anything with webauth if running cron, xmlrpc, drush, etc.
+ */
+function asu_webauth_skip() {
+  $base_path = base_path();
+  $self = $_SERVER['PHP_SELF'];
+  $q = $_GET['q'];
+  $bad_paths = variable_get('asu_webauth_services',  t("services/amfphp\nservices/json\nservices/rest\nservices/soap\nservices/xmlrpc"));
+  // See http://youruseragent.info/commonua.en.htm
+  $bad_agent_strings = explode("\n", variable_get('asu_webauth_user_agents', t("googlebot\nmediapartners-google\nmsnbot\nslurp\njeeves\nnutch\nalexa.com\nbaiduspider\nlibcurl\nwget\ngsa-crawler"))); 
+
+  // Is a form being submitted?
+  if (isset($_POST) && count($_POST)) {
+    return TRUE;
+  }
+  // triedWebauth pattern (common across several other webauth-enabled apps)
+  if (isset($_GET['triedWebauth']) && $_GET['triedWebauth']) {
+    return TRUE;
+  }
+  // Cron
+  if ($self == $base_path .'cron.php') {
+    return TRUE;
+  }
+  // XML-RPC
+  if ($self == $base_path .'xmlrpc.php') {
+    return TRUE;
+  }
+  // Drush
+  if (stristr($_SERVER['SCRIPT_FILENAME'], 'drush')) {
+    return TRUE;
+  }
+  // Drush
+  if (isset($_SERVER['argv']) && stristr($_SERVER['argv'][0], 'drush')) {
+    return TRUE;
+  }
+  // Other paths
+  if (path_match($bad_paths)) {
+    return TRUE;
+  }
+  // Features server
+  if (stristr($q, 'fserver')) {
+    return TRUE;
+  }
+  // User agents
+  if (!empty($bad_agent_strings[0])) {
+    foreach ($bad_agent_strings as $agent) {
+      if (stristr($_SERVER['HTTP_USER_AGENT'], $agent)) {
+        return TRUE;
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function asu_webauth_form_alter(&$form, $form_state, $form_id) {
+  // User profile form (password and email address)
+  if ($form_id == 'user_profile_form' && $form['_category']['#value'] == 'account') {
+    asu_webauth_user_profile_form_alter($form, $form_state);
+  }
+}
+
+
+/**
+ * Alter the user profile form.
+ */
+function asu_webauth_user_profile_form_alter(&$form, $form_state) {
+  $account = $form['_account']['#value'];
+  // Unset email address field
+  if (variable_get('asu_webauth_hide_email', TRUE)) {
+    unset($form['account']['mail']);
+    $form['mail'] = array(
+      '#type' => 'value',
+      '#value' => $account->mail,
+    );
+  }
+  // Unset password field
+  if (variable_get('asu_webauth_hide_password', TRUE)) {
+    unset($form['account']['pass']);
+    $form['pass'] = array(
+      '#type' => 'value',
+      '#value' => '',
+    );
+  }
+  // Check if we should just remove the 'Account information' fieldset altogether
+  $fields_remaining = 0;
+  foreach ($form['account'] as $key => $value) {
+    if (is_array($value)) {
+      $fields_remaining++;
+    }
+  }
+  if (!$fields_remaining) {
+    unset($form['account']);
+  }
+}
+
+
+/**
+ * Implementation of hook_link_alter().
+ */
+function asu_webauth_link_alter(&$links, $node) {
+  // Alter links to "Login or register to post comments"
+  if (isset($links['comment_forbidden'])) {
+    $title = $links['comment_forbidden']['title'];
+    $title = str_replace('/user/login', '/asuwebauth-login', $title);
+    $links['comment_forbidden']['title'] = $title;
+  }
+}
+
+
+function asu_webauth_css_js() {
+  global $base_url;
+
+  $js = 'var ASUHeader = ASUHeader || {};';
+ 
+  $ssi_link = $base_url.'/asuwebauth-login';
+  if (variable_get('asu_webauth_callapp', '')) {
+    $ssi_link .= '?destination='.urlencode(variable_get('asu_webauth_callapp', ''));
+  }
+  $js .= 'ASUHeader.signin_url = "'.$ssi_link.'";';
+
+  $sso_link = $base_url.'/asuwebauth-logout';
+  if (variable_get('asu_webauth_onLogoutURL', 'https://webapp4.asu.edu/myasu/Signout')) {
+    $sso_link .= '?destination='.urlencode(variable_get('asu_webauth_onLogoutURL', 'https://webapp4.asu.edu/myasu/Signout'));
+  }
+  $js .= 'ASUHeader.signout_url = "'.$sso_link.'";';
+
+  drupal_add_js($js, 'inline', 'header');
+
+}
+
+/**
+ * Implementation of hook_theme_registry_alter().
+ */
+function asu_webauth_theme_registry_alter(&$variables) {
+  // If configured to do so, override theme_username to use the LDAP common name.
+  if (variable_get('asu_webauth_show_ldap_name', FALSE) && function_exists('ldap_search')) {
+    $variables['username']['function'] = 'asu_webauth_ldap_username';
+  }
+}
+
+
+/**
+ * Implementation of hook_user().
+ */
+function asu_webauth_user($op, &$edit = array(), &$account, $category = NULL) {
+  // If configured to do so, use the LDAP common name for the page name on user pages.
+  if (variable_get('asu_webauth_show_ldap_name', FALSE) && function_exists('ldap_search')) {
+    if ($op == 'view') {
+      $cn = asu_webauth_ldap_generate_name($account);
+      drupal_set_title($cn);
+    }
+  }
+}
+
+/**
+ * Implementation of hook_flush_caches().
+ */
+function asu_webauth_flush_caches() {
+  return array('cache_asuwebauth');
+}

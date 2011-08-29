@@ -1,0 +1,26 @@
+<?php
+// $Id: flashy.module,v 1.1 2009/03/19 19:50:09 crell Exp $
+
+/**
+ * Implementation of hook_autoload_info().
+ */
+function flashy_autoload_info() {
+  return array(
+    'Flashy' => array(
+      'file' => 'flashy.wrapper.inc',
+    ),
+  );
+}
+
+/**
+ * Procedural wrapper for creating a new Flashy object.
+ *
+ * This function exists mostly just to support fully-fluent call chains.  It is
+ * otherwise identical to just calling new Flashy();
+ *
+ * @return
+ *   An empty Flashy object.
+ */
+function flashy_create() {
+  return new Flashy();
+}

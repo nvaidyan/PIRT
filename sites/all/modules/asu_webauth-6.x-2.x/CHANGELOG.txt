@@ -1,0 +1,107 @@
+ASU Webauth Changelog
+
+6.x-2.0-beta6, 2011-06-13
+-------------------------
+- Eliminated warning triggered by an empty User Agents list.
+- Added support for path patterns(i.e. 'services/*') in the service pages bypass setting
+- Reinserted code that was removed in 6.x-2.0-beta5 on asu_webauth_menu_access function (asu_webauth.module) to fix redirect loops.
+
+6.x-2.0-beta5, 2011-06-08
+-------------------------
+- Improved support for the ASU header.
+- New webauth bypass settings allows a custom list of paths and a custom list
+  of user agents (i.e web spiders) to skip webauth authentication.
+
+6.x-2.0-beta4, 2010-08-30
+-------------------------
+New features
+- Optional LDAP user common name lookup based on ASURITE ID. If enabled, this
+  value will be used when rendering user names using theme_username(). These
+  names are cached locally for performance reasons.
+- A form specifically made for quickly adding ASURITE users is now available
+  at /admin/user/user/add-asuwebauth.
+Bug fixes
+- Better tracking of user login / logout state results in better behavior
+  regarding auto-login / logout of users whose Webauth state has changed.
+- Play nicely with Drush, Services, Features Server, cron, and search engines.
+- Support for sites that run within a sub-path of a domain, e.g.
+  example.asu.edu/drupal
+- Fix "access denied" issues when users who aren't members of a site attempt
+  to logout of Webauth.
+- Fix endless redirect loop when users aren't auto-registered but attempt to
+  login to a page that requires registration.
+- Redirect users to the path alias for a page, if one exists.
+- Improved code documentation and cleanup per Coder module review.
+
+
+6.x-2.0-beta3, 2010-07-08
+-------------------------
+- Add settings to override the login and logout destination URLs
+- Use the webconsulting.asu.edu Features server to host the module so
+  that Update Status will now accurately reflect whether or not a new
+  release of the module is available.
+- Address numerous bugs related to login / logout, particularly when
+  using the ASU Header 3.0
+- Fix a pass-by-reference typo (caused PHP notices)
+- Fix form submissions being lost if a user's Webauth state had changed
+  between page load and page submission.
+
+
+6.x-2.0-beta1, 2010-01-29
+-------------------------
+IMPORTANT:
+This version of the module complies with Webauth protocol v2.2. This
+protocol version requires /all/ sites running Webauth to be registered
+to the Webauth client whitelist.
+
+@TODO (Add process for requesting a domain be added to the webauth client
+whitelist).
+
+- Completely rewritten from the ground up.
+- Complies with Webauth protocol v2.2
+- Rewrite has address numerous bugs, in particular:
+  - Endless redirect loops
+  - 6.x version required account registration, even though it presented
+    it as an option. New version /does not/ require account creation.
+
+
+6.x-1.0, 2008-11-04
+-------------------------
+Porting to 6.x
+- Manually included the user.pages.inc file to compensate for Drupal 6 
+  streamlining the module loading and not loading this required inc file.
+
+
+5.x-1.0, 2007-08-06
+-------------------------
+Version 1.0 Release
+- Changed package definition to "ASU"
+
+
+5.x-1.0-beta4, 2007-06-04
+-------------------------
+General
+- Default role for webauth'd users is now "anonymous user"
+
+
+5.x-1.0-beta3, 2007-05-09
+-------------------------
+General
+- Local login is now possible even if the site admin has set all pages to
+  require webauth login.  Local login can be reached via user/?locallogin
+
+
+5.x-1.0-beta2, 2007-04-16
+-------------------------
+General
+- New setting added to force all requests to /user to be redirected to 
+  webauth.  Local login can still be accessed via /user?locallogin
+- User roles are now updated on every login, to ensure webauth role gets set.
+- Added optional setting to allow the user email field to be blank.
+- Fixed issues where errors were reported upon user creation.
+- Attempted to fix issue where module would think the user had an active 
+  webauth session when they actually don't.  This needs to be tested and 
+  verified.
+- All settings are now stored in individual Drupal system variables, instead
+  of being in one large array.
+- General code cleanup

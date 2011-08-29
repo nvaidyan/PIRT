@@ -1,0 +1,15 @@
+==== POST-1.0 STUFF ====
+* Search more types of stuff, such as:
+  - users
+  - modules (borrow some functionality from drush)
+  - functions in API module
+  - help blurbs?
+  - themes?
+  - also make sure that each of these types can be weighted, so that if I want taxonomy terms to show up at the top, i can.
+* Don't just have paths. Have actions as well. When a user highlights a node, a second autocomplete appears with things like "view" and "edit" that go straight to those screens for that node. It's basically the admin console in admin/user/user and admin/content/node. Use D6 actions.
+* How can we offload more of the searching to the client-side JS?
+  - for instance, if I've typed in 'admin', the server has given me a bunch of options, so if i keep typing, the JS should filter those options instead of asking the server again. It only asks the server when I backspace.
+* Should there be a global settings page or per-user settings? Both?
+* hook_teleport_catalog() that allows modules to add stuff to the search.
+* Make interface more Quicksilverish -- fewer keystrokes, better separation of what the user has typed vs. what the system is guessing vs. the list of possibilities. Subclass the autocomplete behavior so that it can be changed.
+* Make dialog draggable (without adding too much JS overhead).

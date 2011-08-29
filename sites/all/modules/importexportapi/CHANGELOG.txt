@@ -1,0 +1,22 @@
+
+Import/Export API 6.x-1, 2009-10-12
+-----------------------------------
+#600335: Schema definition invalid for serial fields.
+#600520: The term_node table needs vid in D6.
+
+Import/Export API 6.x-1, 2009-07-07
+-----------------------------------
+#505726: User warning db.sequences doesn´t exist.
+#454574: "Back (initial selection)" button not working.
+
+Import/Export API 6.x-1, 2009-05-06
+-----------------------------------
+#454448: importexportapi_menu.inc
+#455304: importexport_filter.inc
+#455462: importexportapi_comment.inc
+#455470: Watchdog module was renamed to dblog
+#455474: importexportapi_system.inc
+
+Import/Export API 6.x-1, 2009-05-05
+-----------------------------------
+#283462: Drupal 6.x starting point patch

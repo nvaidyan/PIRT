@@ -1,0 +1,14 @@
+
+name = "Views Slideshow Xtra"
+description = "Adds additional functionality to the Views Slideshow module."
+core = "6.x"
+version = "6.x-1.0-beta1"
+package = "Views"
+dependencies[] = views_slideshow
+
+; Information added by drupal.org packaging script on 2011-07-07
+version = "6.x-1.2"
+core = "6.x"
+project = "views_slideshow_xtra"
+datestamp = "1310007722"
+

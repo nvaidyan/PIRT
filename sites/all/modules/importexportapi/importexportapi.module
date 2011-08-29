@@ -1,0 +1,1010 @@
+<?php
+
+/**
+ * @file
+ * Allows data entities in Drupal to be imported and exported in a variety of
+ * formats.
+ */
+
+/**
+ * The maximum number of times that the entity dependency checker will loop
+ * through the data definitions. This maximum limit exists in order to prevent
+ * infinite loops, which may occur if entities have been defined with cyclic
+ * dependencies.
+ */
+define('IMPORTEXPORTAPI_DEPENDENCY_TIMEOUT', 10);
+
+/**
+ * Implementation of hook_help().
+ */
+function importexportapi_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#importexportapi':
+      return t('The import / export API module allows data entities in Drupal to be imported and exported in a variety of formats.');
+  }
+}
+
+/**
+ * Implementation of hook_init().
+ */
+function importexportapi_init() {
+  // hook init is called even on cached pages, but we don't want to
+  // actually do anything in that case.
+  if (!function_exists('drupal_get_path')) {
+    return;
+  }
+
+  _importexportapi_include_core_defs();
+  _importexportapi_include_core_engines();
+  _importexportapi_include_core_fields();
+}
+
+/**
+ * Implementation of hook_def_field_types().
+ */
+function importexportapi_def_field_types($op) {
+  $type = array();
+
+  switch ($op) {
+    case 'placeholders':
+      $type['int'] = '%d';
+      $type['float'] = '%f';
+      $type['string'] = "'%s'";
+      $type['file'] = "'%s'";
+      $type['freeform'] = "'%s'";
+      $type['serialized'] = "'%s'";
+      $type['datetime'] = "'%s'";
+      break;
+    case 'defaults':
+      $type['int'] = array('#required' => FALSE, '#default_value' => 0);
+      $type['float'] = array('#required' => FALSE, '#default_value' => 0.0);
+      $type['string'] = array('#required' => FALSE, '#default_value' => '');
+      $type['file'] = array('#required' => FALSE, '#default_value' => '');
+      $type['freeform'] = array('#required' => FALSE, '#default_value' => array(), '#process' => array('importexportapi_process_freeform' => array()));
+      $type['serialized'] = array('#required' => FALSE, '#default_value' => '', '#process' => array('importexportapi_process_serialized' => array()));
+      $type['datetime'] = array('#required' => FALSE, '#default_value' => '', '#process' => array('importexportapi_process_datetime' => array()));
+      $type['array'] = array('#process' => array('importexportapi_process_array' => array()));
+      $type['entity'] = array();
+      break;
+  }
+
+  return $type;
+}
+
+/**
+ * Implementation of hook_engines_get_put().
+ */
+function importexportapi_engines_get_put() {
+  return array(
+    'db' => array(
+      'title' => t('Database'),
+      'get' => array(
+        'callback' => 'importexportapi_db_get',
+        'build' => array('importexportapi_db_build' => array('get'), 'importexportapi_db_build_references' => array('get')),
+        'build_alt_key' => array('importexportapi_db_build_alt_key' => array('get'))
+      ),
+      'put' => array(
+        'callback' => 'importexportapi_db_put',
+        'build' => array('importexportapi_db_build' => array('put'), 'importexportapi_db_build_references' => array('put')),
+        'build_alt_key' => array('importexportapi_db_build_alt_key' => array('put')),
+        'process' => array('importexportapi_db_put_resolve_alt_keys' => array())
+      )
+    ),
+    'xml' => array(
+      'title' => t('XML (eXtensible Markup Language)'),
+      'get' => array(
+        'callback' => 'importexportapi_xml_get',
+        'build' => array('importexportapi_xml_build' => array('get')),
+        'build_alt_key' => array('importexportapi_xml_build_alt_key' => array('get'))
+      ),
+      'put' => array(
+        'callback' => 'importexportapi_xml_put',
+        'build' => array('importexportapi_xml_build' => array('put')),
+        'build_alt_key' => array('importexportapi_xml_build_alt_key' => array('put'))
+      )
+    ),
+    'csv' => array(
+      'title' => t('CSV (Comma Separated Values)'),
+      'get' => array(
+        'callback' => 'importexportapi_csv_get',
+        'build' => array('importexportapi_csv_build' => array('get')),
+        'build_alt_key' => array('importexportapi_csv_build_alt_key' => array('get'))
+      ),
+      'put' => array(
+        'callback' => 'importexportapi_csv_put',
+        'build' => array('importexportapi_csv_build' => array('put')),
+        'build_alt_key' => array('importexportapi_csv_build_alt_key' => array('put'))
+      )
+    )
+  );
+}
+
+/**
+ * Fetches the data definition for the specified entity or field. Although the
+ * importexportapi_set_def() function can always be used instead of this one,
+ * it is recommended for code readability that you use this function, unless
+ * you actually need to set the value of a field's attributes.
+ *
+ * @param $field
+ *   The field or entity for which to fetch a definition. The required format
+ *   for this value is the same as that for the $field parameter in the
+ *   importexportapi_set_def() function (defaults to NULL).
+ * @param $build
+ *   Boolean flag indicating whether or not the data definition(s) should be
+ *   built, using importexportapi_build_def(), before being returned (defaults
+ *   to FALSE).
+ *
+ * @return
+ *   Nested array of entity attributes and fields; or an array of all entity
+ *   attributes and fields, if $field is NULL.
+ */
+function importexportapi_get_def($field = NULL, $build = FALSE) {
+  if ($build) {
+    importexportapi_build_def();
+  }
+
+  return importexportapi_set_def($field);
+}
+
+/**
+ * Fetches the data definition for the specified entity or field, as defined by
+ * modules in Drupal; or fetches all data definitions for all available
+ * entities. Also allows the data definition for the specified entity or field
+ * to have its values modified.
+ *
+ * @param $field
+ *   The field or entity for which to fetch a definition. This value should
+ *   always be an array, but it can also be a string when specifying an entity.
+ *   If the field's direct parent is not an entity, then each element should be
+ *   one of the field's ancestors (in order from furthest to closest ancestor).
+ *   The final element is always the field itself (defaults to NULL).
+ * @param $values
+ *   The values to set for attributes of the specified field. If these values
+ *   already exist, they will be overridden (for non-array values) or merged
+ *   (for array values). Only set values for attributes here - do not modify
+ *   child elements. Child elements should be modified by calling this function
+ *   specifically for that child (defaults to an empty array).
+ * @param $refresh
+ *   Whether or not to reset the internal cache of this function (defaults to
+ *   FALSE).
+ *
+ * @return
+ *   Nested array of entity attributes and fields; or an array of all entity
+ *   attributes and fields, if $field is NULL.
+ */
+function importexportapi_set_def($field = NULL, $values = array(), $refresh = FALSE) {
+  static $def;
+
+  if (!isset($def) || $refresh) {
+    $def = array();
+
+    // Fetch the core of the data definitions.
+    foreach (module_implements('def') as $module) {
+      $def_temp = module_invoke($module, 'def');
+      if (isset($def_temp) && is_array($def_temp)) {
+        $def = array_merge_recursive($def, $def_temp);
+      }
+    }
+
+    // Allow modules to alter the definitions that have been loaded.
+    foreach (module_implements('def_alter') as $module) {
+      $function = $module .'_def_alter';
+      $function($def);
+    }
+
+    // Take what's been provided so far, and build definitions that are ready
+    // to be passed to the 'get' and 'put' engines.
+    foreach ($def as $entity_id => $entity_data) {
+      $def[$entity_id] = _importexportapi_set_def_init($entity_id, $entity_data);
+    }
+    $def = _importexportapi_set_def_dependencies($def);
+  }
+
+  // Return a specific entity, field, or nested field.
+  if (isset($field)) {
+    if (!is_array($field)) {
+      $field = array($field);
+    }
+
+    // If the field is an array, then recurse down through the field
+    // definition.
+    return _importexportapi_set_def_values($field, $def, $values);
+  }
+  // Return all entities.
+  return $def;
+}
+
+/**
+ * Helper function for importexportapi_set_def(). Builds the basic attributes
+ * of an entity, to prepare it for use by other components of the system. This
+ * function recurses down from an entity, to its fields, to children of array
+ * fields.
+ *
+ * @param $field_id
+ *   The name of the field to be built. When called by other functions, this is
+ *   generally the name of an entity.
+ * @param $field
+ *   The data to be built for the specified field. When called by other
+ *   functions, this is generally the entity definition.
+ *
+ * @return
+ *   The built version of $field.
+ */
+function _importexportapi_set_def_init($field_id, $field) {
+  $field['#id'] = $field_id;
+
+  // 'string' is the default field type when none is specified.
+  if (!isset($field['#type'])) {
+    $field['#type'] = 'string';
+  }
+
+  // Use default field values for any fields that haven't been set.
+  $default_values = importexportapi_get_field_type_info($field['#type']);
+  $field += $default_values;
+  if (isset($field['#process']) && isset($default_values['#process'])) {
+    $field['#process'] = array_merge($default_values['#process'], $field['#process']);
+  }
+  if (isset($field['#alt_key_for']) && !isset($field['#unique'])) {
+    $field['#unique'] = TRUE;
+  }
+  if ((!empty($field['#key']) || !empty($field['#reference_entity'])) && $field['#type'] == 'int') {
+    $field['#default_value'] = NULL;
+  }
+
+  if ($field['#type'] == 'entity' && !isset($field['#source'])) {
+    $field['#source'] = 'db';
+  }
+  foreach (element_children($field) as $child) {
+    // Arrays inherit the same parents as those defined for their direct
+    // parent, with the addition of the direct parent itself.
+    $field[$child]['#parents'] = isset($field['#parents']) ? $field['#parents'] : array();
+    $field[$child]['#parents'][] = $field_id;
+
+    if (empty($field[$child]['#type']) || $field[$child]['#type'] != 'array') {
+      // For fields that reference other fields, if the reference table has
+      // been set, but not the reference field, then we assume that the name of
+      // the referenced field is the same as this field's name.
+      if (isset($field[$child]['#reference_entity']) && !isset($field[$child]['#reference_field'])) {
+        $field[$child]['#reference_field'] = array($child);
+      }
+      if (isset($field[$child]['#reference_entity']) && !isset($field[$child]['#reference_delta'])) {
+        $field[$child]['#reference_delta'] = 0;
+      }
+
+      if (!empty($field[$child]['#key']) || !empty($field[$child]['#key_component'])) {
+        $field['#keys'][$child] = $child;
+      }
+    }
+  }
+
+  // Recurse down through entity fields, array fields, and nested arrays.
+  foreach (element_children($field) as $child) {
+    $field[$child] = _importexportapi_set_def_init($child, $field[$child]);
+  }
+
+  return $field;
+}
+
+/**
+ * Helper function for importexportapi_set_def(). Determines dependencies
+ * between entities, and re-arranges the list of entities to reflect entity
+ * dependency.
+ *
+ * @param $def
+ *   The data definitions for all entities.
+ *
+ * @return
+ *   The re-arranged version of $def, with entity dependencies also explicitly
+ *   marked.
+ */
+function _importexportapi_set_def_dependencies($def) {
+  $def_new = array();
+
+  // Determine all dependencies for each entity.
+  foreach ($def as $entity_id => $entity_data) {
+    if (!isset($def[$entity_id]['#dependencies'])) {
+      $def[$entity_id]['#dependencies'] = array();
+    }
+    $def[$entity_id]['#dependencies'] += _importexportapi_set_def_dependencies_recurse($entity_data);
+  }
+
+  $loop_count = 0;
+  // Loop through the original list of entities, until either all the entities
+  // have been copied to $def_new, or we reach the loop timeout.
+  while (count($def) > count($def_new) && $loop_count < IMPORTEXPORTAPI_DEPENDENCY_TIMEOUT) {
+    $loop_count++;
+
+    foreach ($def as $entity_id => $entity_data) {
+      if (!isset($def_new[$entity_id])) {
+        $pending = FALSE;
+
+        // Check that all entities upon which this entity depends have already
+        // been copied to $def_new. If not, this entity becomes 'pending', and
+        // it gets copied at a later pass through the loop.
+        foreach ($entity_data['#dependencies'] as $dependent) {
+          if (!isset($def_new[$dependent]) && isset($def[$dependent])) {
+            $pending = TRUE;
+            break;
+          }
+        }
+
+        // The entity is not (or is no longer) pending, so copy it to $def_new
+        // now.
+        if (!$pending || $loop_count == IMPORTEXPORTAPI_DEPENDENCY_TIMEOUT) {
+          $def_new[$entity_id] = $entity_data;
+        }
+      }
+    }
+  }
+
+  return $def_new;
+}
+
+/**
+ * Helper function for _importexportapi_set_def_dependencies(). Recurses down
+ * through all fields of an entity, and finds entity dependencies.
+ *
+ * @param $field
+ *   The entity or field to recurse down into.
+ *
+ * @return
+ *   An array listing the dependent entities found.
+ */
+function _importexportapi_set_def_dependencies_recurse($field) {
+  $dependencies = array();
+
+  foreach (element_children($field) as $child) {
+    if ($field[$child]['#type'] != 'array' && isset($field[$child]['#reference_entity'])) {
+      $parent_entity = $field[$child]['#parents'][0];
+
+      // Any field that is a reference to another field in a different entity
+      // indicates the presence of a dependency.
+      if ($field[$child]['#reference_entity'] != $parent_entity) {
+        $dependencies[$field[$child]['#reference_entity']] = $field[$child]['#reference_entity'];
+      }
+    }
+
+    // Recurse down through entity fields, array fields, and nested arrays. The
+    // array union operator ensures that the list of dependencies is free of
+    // duplicate elements.
+    $dependencies += _importexportapi_set_def_dependencies_recurse($field[$child]);
+  }
+
+  return $dependencies;
+}
+
+/**
+ * Helper function for importexportapi_get_def(). Fetches the definition for
+ * the specified field, and optionally sets the attributes provided in $values
+ * before doing so.
+ *
+ * @param $field
+ *   The field or entity for which to fetch a definition. This value should
+ *   always be an array. If the field's direct parent is not an entity, then
+ *   each element should be one of the field's ancestors (in order from
+ *   furthest to closest ancestor). The final element is always the field
+ *   itself.
+ * @param &$def
+ *   The definition for the parent of the current field. This array, or a
+ *   subset of it, gets returned; and if any changes are made to it, they get
+ *   passed back by reference.
+ * @param $values
+ *   The values to set for attributes of the specified field. If these values
+ *   already exist, they will be overridden (for non-array values) or merged
+ *   (for array values). Only set values for attributes here - do not modify
+ *   child elements. Child elements should be modified by calling this function
+ *   specifically for that child (defaults to NULL).
+ *
+ * @return
+ *   The definition for the specified field, or NULL if the field could not be
+ *   found.
+ */
+function _importexportapi_set_def_values($field, &$def, $values = array()) {
+  // Grab the next parent off the array, or the current field if we're at the
+  // end.
+  $field_index = array_shift($field);
+
+  if (empty($field)) {
+    if (isset($def[$field_index])) {
+      // Overwrite the definition with any new values that have been provided.
+      if (!empty($values)) {
+        $def[$field_index] = _importexportapi_set_def_values_recurse($def[$field_index], $values);
+      }
+
+      return $def[$field_index];
+    }
+    // We have recursed through all parent fields, and the current field cannot
+    // be found - nothing more we can do.
+    return NULL;
+  }
+
+  // There are still parent fields available, so recurse down until we reach
+  // the current field.
+  return _importexportapi_set_def_values($field, $def[$field_index], $values);
+}
+
+/**
+ * Similar to array_merge_recursive but keyed-valued are always overwritten.
+ * Priority goes to the 2nd array. This function based on the
+ * array_merge_recursive2() function at:
+ * http://php.net/array-merge-recursive#42663
+ *
+ * @param $array1
+ *   The first array to be recursively merged.
+ * @param $array2
+ *   The second array to be recursively merged.
+ *
+ * @return
+ *   The result of recursively merging the passed-in arrays.
+ */
+function _importexportapi_set_def_values_recurse($array1, $array2) {
+  if (!is_array($array1) || !is_array($array2)) {
+    return $array2;
+  }
+
+  foreach ($array2 as $key2 => $value2) {
+    $array1_val = isset($array1[$key2]) ? $array1[$key2] : NULL;
+    $array1[$key2] = _importexportapi_set_def_values_recurse($array1_val, $value2);
+  }
+
+  return $array1;
+}
+
+/**
+ * Builds the data definitions. All of the 'build' callbacks for the specified
+ * 'get' and 'put' formats are executed, and alternate key fields are also
+ * copied and generated.
+ *
+ * @param $provided_formats
+ *   A nested array in the form ('get' => array('format1', 'format2', ...),
+ *   'put' => array('format1', 'format2', ...)). All formats that are specified
+ *   here will have their 'build' callbacks executed. You do not need to provide
+ *   both 'get' and 'put'. You can also leave this field unspecified, in which
+ *   case all callbacks for all available formats will be executed (default is
+ *   NULL).
+ * @param $refresh
+ *   Whether or not to reset the internal cache of this function (defaults to
+ *   FALSE).
+ */
+function importexportapi_build_def($provided_formats = NULL, $refresh = FALSE) {
+  static $is_built = FALSE;
+
+  // By default, the building process only happens once per request.
+  if ($is_built && !$refresh) {
+    return;
+  }
+
+  $def = importexportapi_get_def();
+  $formats = array();
+  $format_types = array('get', 'put');
+
+  // Populate the list of engines and associated formats for which to build the
+  // definitions. All formats are grouped into either 'get' or 'put', depending
+  // on their associated engine.
+  foreach ($format_types as $format_type) {
+    if (!isset($provided_formats[$format_type])) {
+      $formats[$format_type] = array();
+      $format_list = importexportapi_get_engines($format_type);
+      if (isset($format_list)) {
+        $formats[$format_type] = array_keys($format_list);
+      }
+    }
+    else {
+      if (!is_array($provided_formats[$format_type])) {
+        $provided_formats[$format_type] = array($provided_formats[$format_type]);
+      }
+
+      $formats[$format_type] = $provided_formats[$format_type];
+    }
+  }
+
+  // Run all 'build' callbacks that have been defined for the specified
+  // formats.
+  foreach ($formats as $format_type => $format_list) {
+    foreach ($format_list as $format) {
+      $callbacks = importexportapi_get_engines($format_type, $format);
+
+      if (isset($callbacks['build'])) {
+        foreach ($callbacks['build'] as $build => $args) {
+          if (function_exists($build)) {
+            foreach ($def as $entity => $fields) {
+              $args_build = array_merge(array($def[$entity]), $args);
+              call_user_func_array($build, $args_build);
+              // The 'build' callback makes its modifications to the definition
+              // through importexportapi_set_def(), so we have to call
+              // importexportapi_get_def() to get updated with these
+              // modifications.
+              $def[$entity] = importexportapi_get_def($entity);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Alternate key generation occurs after the build callbacks have been
+  // executed, so that we are copying and generating fully built fields.
+  foreach ($def as $entity_id => $entity_data) {
+    importexportapi_set_alt_keys($entity_id, $entity_data, $formats);
+  }
+
+  $is_built = TRUE;
+}
+
+/**
+ * Retrieves the default properties or the SQL placeholder for the defined
+ * field type.
+ *
+ * @param $type
+ *   The internal name of the field type. Leave NULL to retrieve info for all
+ *   field types.
+ * @param $op
+ *   The type of info to get. Leave NULL to retrieve default properties, or
+ *   specify 'placeholders' to retrieve the SQL placeholder.
+ * @param $refresh
+ *   Whether or not to reset the internal cache of this function (defaults to
+ *   FALSE).
+ *
+ * @return
+ *   The info for the specified type.
+ */
+function importexportapi_get_field_type_info($type = NULL, $op = NULL, $refresh = FALSE) {
+  static $types;
+
+  if (!isset($op)) {
+    $op = 'defaults';
+  }
+  if (!isset($types)) {
+    $types = array();
+  }
+
+  if (!isset($types[$op]) || $refresh) {
+    $types[$op] = module_invoke_all('def_field_types', $op);
+  }
+
+  if (isset($type)) {
+    return isset($types[$op][$type]) ? $types[$op][$type] : array();
+  }
+  return $types[$op];
+}
+
+/**
+ * Retrieves the callback function of the engine for the specified type, that
+ * is associated with the specified format; or the callback functions of all
+ * engines of the specified type; or the callback functions all engines.
+ *
+ * @param $type
+ *   The type of engine callback to retrieve. Can be either 'get', 'put', or
+ *   NULL. Default is NULL.
+ * @param $format
+ *   The format for which to retrieve an engine callbck (e.g. 'xml', 'csv').
+ *   Default is NULL.
+ * @param $refresh
+ *   Whether or not to reset the internal cache of this function (defaults to
+ *   FALSE).
+ *
+ * @return
+ *   The callback function of the relevant engine, as a string; or the callback
+ *   functions of all engines of the specified type, as an array; or all
+ *   callback functions of all engines, as an array.
+ */
+function importexportapi_get_engines($type = NULL, $format = NULL, $refresh = FALSE) {
+  static $engines;
+
+  if (!isset($engines) || $refresh) {
+    $engines = array();
+    $hook_data = module_invoke_all('engines_get_put');
+
+    // Humans prefer to think of engines in terms of format, and then in terms
+    // of callback type. But the system prefers to think of engines in the
+    // opposite way. So the hooks define engine callbacks by format and then by
+    // callback type, and we then convert the hook data to be grouped by
+    // callback type and then by format.
+    foreach ($hook_data as $hook_format => $callbacks) {
+      foreach ($callbacks as $callback_type => $callback) {
+        if (!isset($engines[$callback_type]) && $callback_type != 'title') {
+          $engines[$callback_type] = array();
+        }
+
+        $engines[$callback_type][$hook_format] = $callback;
+        $engines[$callback_type][$hook_format]['title'] = $callbacks['title'];
+      }
+    }
+  }
+  if (isset($format)) {
+    return isset($engines[$type][$format]) ? $engines[$type][$format] : NULL;
+  }
+  if (isset($type)) {
+    return isset($engines[$type]) ? $engines[$type] : NULL;
+  }
+  return $engines;
+}
+
+/**
+ * Passes a set of entity definitions to the appropriate 'get' engine, and
+ * returns the data available for the specified entities, in a standard
+ * structured array format.
+ *
+ * @param $entities
+ *   An array listing the entities to be gotten.
+ * @param $get_format
+ *   The format of the data source for the specified entities. This
+ *   determines the 'get' engine to be called upon. If set to NULL, then the
+ *   format defined by the '#source' attribute of the first available entity is
+ *   used instead. Default is NULL.
+ * @param $variables
+ *   An array of variables (keys and values) to be passed to the 'get' engine.
+ *   One common variable that gets passed is 'raw' (the raw data to be gotten).
+ * @param $put_formats
+ *   An array of destination data formats, that the data definition should be
+ *   built for. If you wish to perform a 'put' operation on the returned data
+ *   at a later stage, you will only be able to perform it using one of the
+ *   formats that has been specified here. A single format may be entered as a
+ *   string instead of an array. If set to NULL, then the data gets built for
+ *   all available 'put' formats. Default is NULL.
+ * @param $def
+ *   The entity definitions to use. If none are provided, then the standard
+ *   definitions will be gotten from importexportapi_get_def() (default is
+ *   NULL).
+ *
+ * @return
+ *   Structured array of data, suitable for being passed to
+ *   importexportapi_put_data().
+ */
+function importexportapi_get_data($entities, $get_format = NULL, $variables = array(), $def = NULL) {
+  if (!isset($def)) {
+    $def = importexportapi_get_def(NULL, TRUE);
+  }
+  // If no 'get' format has been specified, then use the 'source' format of the
+  // first available entity (default 'source' format is 'db').
+  if (!isset($get_format)) {
+    $get_format = $def[$entities[0]]['#source'];
+  }
+
+  $get_callbacks = importexportapi_get_engines('get', $get_format);
+  if (!isset($get_callbacks['callback'])) {
+    return NULL;
+  }
+
+  $function = $get_callbacks['callback'];
+  if (!function_exists($function)) {
+    return NULL;
+  }
+  // Run the 'get' operations.
+  $data = array();
+  $entities = array_flip($entities);
+  foreach (array_keys($def) as $entity) {
+    if (isset($entities[$entity])) {
+      $data = array_merge($data, $function($def[$entity], $variables));
+    }
+  }
+
+  // Execute 'process' 'get' callbacks.
+  importexportapi_process_data($data, $get_format, 'get');
+
+  $data['#source_get'] = $get_format;
+
+  return $data;
+}
+
+/**
+ * Passes a set of structured data to the appropriate 'put' engine, and
+ * returns the result of the 'put' operation.
+ *
+ * @param $data
+ *   An array of structured data, as returned by importexportapi_get_data().
+ * @param $put_format
+ *   The format of the data destination for the structured data. This
+ *   determines the 'put' engine to be called upon. If set to NULL, then the
+ *   format defined by the '#source' attribute of the first available entity
+ *   instance (in the structured data provided) is used instead. Default is
+ *   NULL.
+ * @param $variables
+ *   An array of variables (keys and values) to be passed to the 'put' engine.
+ *
+ * @return
+ *   The result of the 'put' operation. This varies from one engine to another.
+ *   Some engines (such as 'db') only return status codes, whereas others (such
+ *   as 'xml') return the data itself in its final rendered form.
+ */
+function importexportapi_put_data($data, $put_format = NULL, $variables = array()) {
+  if (!isset($put_format)) {
+    $put_format = $data[0]['#source'];
+  }
+
+  $put_callbacks = importexportapi_get_engines('put', $put_format);
+  $function = $put_callbacks['callback'];
+
+  if (!isset($function) || !function_exists($function)) {
+    return NULL;
+  }
+
+  importexportapi_process_data($data, $put_format, 'put');
+
+  return $function($data, $variables);
+}
+
+/**
+ * Searches for fields that reference other fields, and checks to see if those
+ * other fields have alternate key fields. Every alternate key field that is
+ * found gets copied alongside the referencing field. Essentially, new fields
+ * get generated, and those fields are copies of defined alternate key fields.
+ * All generated fields are explicitly marked with the '#generated' attribute,
+ * to make it clear to other parts of the system that they are not
+ * user-defined.
+ *
+ * @param $field_id
+ *   The ID of the field specifed.
+ * @param $field
+ *   The field that is a reference to another field, that in turn may have
+ *   alternate key fields defined for it. All alternate key fields that are
+ *   found will be copied (generated) alongside this field, using the
+ *   importexportapi_set_def() function (thus nothing is returned).
+ * @param $formats
+ *   An array of 'get' and 'put' formats and their callbacks.
+ */
+function importexportapi_set_alt_keys($field_id, $field, $formats) {
+  $alt_key_ignore = isset($field['#alt_key_ignore']) ? $field['#alt_key_ignore'] : array();
+  $alt_key_ignore_all = is_bool($alt_key_ignore) ? $alt_key_ignore : FALSE;
+
+  // We only care about this field if it references another field.
+  if (isset($field['#reference_field']) && !$alt_key_ignore_all) {
+    $reference_index = array_pop($field['#reference_field']);
+    $ref_parent_array = array_merge(array($field['#reference_entity']), $field['#reference_field']);
+
+    // Ignore this field if it's a sibling of the field that it's referencing.
+    $parent_diff = array_diff($field['#parents'], $ref_parent_array);
+    $parent_intersect = array_intersect($field['#parents'], $ref_parent_array);
+    if (!empty($parent_diff) || (!empty($parent_intersect) && count($field['#parents']) <= count($ref_parent_array))) {
+      // Grab the definition for the parent of the field being referenced.
+      $ref_parent = importexportapi_get_def($ref_parent_array);
+
+      if (!empty($ref_parent)) {
+        // Every child of $ref_parent is a 'candidate' for being copied over. Only
+        // the lucky children actually get copied, though. :)
+        foreach (element_children($ref_parent) as $candidate_id) {
+          $alt_key_candidate = $ref_parent[$candidate_id];
+          $existing_candidate = importexportapi_get_def(array_merge($field['#parents'], array($alt_key_candidate['#id'])));
+          if (isset($alt_key_candidate['#alt_key_for']) && !isset($alt_key_candidate['#generated']) && $alt_key_candidate['#alt_key_for'] == $reference_index && !isset($alt_key_ignore[$alt_key_candidate['#id']])) {
+            $values = array();
+            $alt_key_rename = isset($existing_candidate);
+
+            // Rename the field's ID if it is not unique.
+            if ($alt_key_rename) {
+              $alt_key_candidate['#id'] = $field_id .'_'. $alt_key_candidate['#id'];
+              $alt_key_candidate['#alt_key_rename'] = $field_id;
+            }
+            $existing_candidate = importexportapi_get_def(array_merge($field['#parents'], array($alt_key_candidate['#id'])));
+
+            if (!isset($existing_candidate)) {
+              // Change some attributes of the copied field, to reflect its new
+              // context.
+              $alt_key_candidate['#reference_entity'] = $alt_key_candidate['#parents'][0];
+              $alt_key_candidate['#reference_field'] = $alt_key_candidate['#parents'];
+              array_shift($alt_key_candidate['#reference_field']);
+              $alt_key_candidate['#reference_field'][] = $candidate_id;
+              $alt_key_candidate['#reference_delta'] = $field['#reference_delta'];
+              $alt_key_candidate['#reference_parent'] = isset($field['#reference_parent']) ? $field['#reference_parent'] : NULL;
+              $alt_key_candidate['#parents'] = $field['#parents'];
+              $alt_key_candidate['#key_component'] = FALSE;
+              $alt_key_candidate['#alt_key_for'] = $field_id;
+              // Explicitly mark this field as 'generated'.
+              $alt_key_candidate['#generated'] = TRUE;
+
+              // Save the new copy of the field to the master definition store.
+              $values[$alt_key_candidate['#id']] = $alt_key_candidate;
+              importexportapi_set_def($field['#parents'], $values);
+
+              // Allow further building to occur for the new generated field.
+              importexportapi_build_alt_key($alt_key_candidate, $formats);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Recurse down through all children of this field.
+  foreach (element_children($field) as $child) {
+    importexportapi_set_alt_keys($child, $field[$child], $formats);
+  }
+}
+
+/**
+ * Builds alternate keys after they have been generated.
+ *
+ * @param $alt_key
+ *   The definition for the generated alternate key.
+ * @param $formats
+ *   An array of 'get' and 'put' formats and their callbacks.
+ */
+function importexportapi_build_alt_key($alt_key, $formats) {
+  // Run all 'build_alt_key' callbacks that have been defined for the specified
+  // formats.
+  foreach ($formats as $format_type => $format_list) {
+    foreach ($format_list as $format) {
+      $callbacks = importexportapi_get_engines($format_type, $format);
+
+      if (isset($callbacks['build_alt_key'])) {
+        foreach ($callbacks['build_alt_key'] as $build => $args) {
+          if (function_exists($build)) {
+            $args_build = array_merge(array($alt_key), $args);
+            call_user_func_array($build, $args_build);
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Executes the '#process' callback on a set of data. The processed data is
+ * passed back by reference.
+ *
+ * @param &$data
+ *   The set of data to be processed, as returned by a 'get' operation.
+ * @param $format
+ *   The format of the data source (for 'get' processing) or of the data
+ *   destination (for 'put' processing).
+ * @param $op
+ *   The operation that the data is being processed for (either 'get' or
+ *   'put').
+ */
+function importexportapi_process_data(&$data, $format, $op) {
+  $callbacks = importexportapi_get_engines($op, $format);
+  if (isset($callbacks['process'])) {
+    foreach ($callbacks['process'] as $process => $args) {
+      if (function_exists($process)) {
+        // Call the 'process' callback for this engine, is one is defined.
+        $args = array_merge(array($data), $args);
+        $data = call_user_func_array($process, $args);
+      }
+    }
+  }
+
+  $source_get = isset($data['#source_get']) ? $data['#source_get'] : NULL;
+
+  foreach (element_children($data) as $data_index) {
+    if (is_numeric($data_index)) {
+      if (isset($data[$data_index]['#process']) && empty($data[$data_index]["#processed_$op"])) {
+        foreach ($data[$data_index]['#process'] as $process => $args) {
+          if (function_exists($process)) {
+            // Call the 'process' callback for this field, is one is defined.
+            $args = array_merge(array($data[$data_index]['#id'], $data[$data_index], $format, $op, $source_get), $args);
+            $data[$data_index] = call_user_func_array($process, $args);
+          }
+        }
+        $data[$data_index]["#processed_$op"] = TRUE;
+      }
+      foreach (element_children($data[$data_index]) as $field) {
+        // Allow for (recursive) custom processing of different field types.
+        _importexportapi_process_data($field, $data[$data_index][$field], $format, $op, $source_get);
+      }
+    }
+  }
+
+  if ($op == 'put') {
+    unset($data['#source_get']);
+  }
+}
+
+/**
+ * Helper function for importexportapi_process_data(). Executes the 'process'
+ * callback recursively, for $data and all its children.
+ *
+ * @param $parent_field
+ *   The field ID of the parent field of $data.
+ * @param &$data
+ *   The field for which to execute the 'process' callback. Any values within
+ *   this variable may be changed and passed back by reference.
+ */
+function _importexportapi_process_data($parent_field, &$data, $format, $op, $source_get) {
+  if (isset($data['#process']) && empty($data["#processed_$op"])) {
+    foreach ($data['#process'] as $process => $args) {
+      if (function_exists($process)) {
+        // Call the 'process' callback for this field, is one is defined.
+        $args = array_merge(array($parent_field, $data, $format, $op, $source_get), $args);
+        $data = call_user_func_array($process, $args);
+      }
+    }
+    $data["#processed_$op"] = TRUE;
+  }
+
+  if ($data['#type'] == 'array' && isset($data['#value'])) {
+    foreach ($data['#value'] as $data_index => $data_fields) {
+      foreach (element_children($data['#value'][$data_index]) as $field) {
+        // Recurse down through all child fields.
+        _importexportapi_process_data($field, $data['#value'][$data_index][$field], $format, $op, $source_get);
+      }
+    }
+  }
+}
+
+/**
+ * Typecasts a value to its correct primitive type, after it has been
+ * imported from a raw string.
+ *
+ * @param $type
+ *   The type of the field, as defined in its data definition (this may be
+ *   different to its type as defined by PHP).
+ * @param $value
+ *   The value of the field, as gotten from a raw string.
+ */
+function importexportapi_string_typecast($type, &$value) {
+  if (isset($value)) {
+    switch ($type) {
+      case 'int':
+        $value = (int) $value;
+        break;
+      case 'float':
+        $value = (float) $value;
+        break;
+      default:
+        break;
+    }
+  }
+}
+
+/**
+ * Loads the data definition files that are included with the core module.
+ */
+function _importexportapi_include_core_defs() {
+  // Acknowledgement: below code based on similar code in the views module.
+  // Load all our module 'on behalfs'.
+  $path = drupal_get_path('module', 'importexportapi') .'/definitions';
+  $files = drupal_system_listing('importexportapi_.*\.inc$', $path, 'name', 0);
+
+  foreach ($files as $file) {
+    // The filename format is very specific. It must be
+    // importexportapi_MODULENAME.inc
+    $module = substr_replace($file->name, '', 0, 16);
+    if (module_exists($module)) {
+      require_once('./'. $file->filename);
+    }
+  }
+}
+
+/**
+ * Loads the 'get' and 'put' engine files that are included with the core
+ * module.
+ */
+function _importexportapi_include_core_engines() {
+  $path = drupal_get_path('module', 'importexportapi') .'/engines';
+  $files = drupal_system_listing('importexportapi_.*\.inc$', $path, 'name', 0);
+  $engines = importexportapi_engines_get_put();
+  $engine_names = array();
+
+  foreach ($engines as $engine => $callbacks) {
+    foreach ($callbacks as $callback => $callback_functions) {
+      $engine_names['importexportapi_'. $engine .'_'. $callback] = TRUE;
+    }
+  }
+
+  foreach ($files as $file) {
+    // The filename format is very specific. It must be
+    // importexportapi_ENGINE_CALLBACK.inc
+    if (isset($engine_names[$file->name])) {
+      require_once('./'. $file->filename);
+    }
+  }
+}
+
+/**
+ * Loads the field callback files that are included with the core module.
+ */
+function _importexportapi_include_core_fields() {
+  // Acknowledgement: below code based on similar code in the views module.
+  // Load all our module 'on behalfs'.
+  $path = drupal_get_path('module', 'importexportapi') .'/fields';
+  $files = drupal_system_listing('importexportapi_.*\.inc$', $path, 'name', 0);
+  $fields = importexportapi_get_field_type_info();
+
+  foreach ($files as $file) {
+    // The filename format is very specific. It must be
+    // importexportapi_MODULENAME.inc
+    $field = substr_replace($file->name, '', 0, 16);
+    if (isset($fields[$field])) {
+      require_once('./'. $file->filename);
+    }
+  }
+}

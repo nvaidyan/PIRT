@@ -1,0 +1,7 @@
+; $Id: views_rdf.info,v 1.1.4.4 2010/05/12 15:27:13 allisterbeharry Exp $
+name = Views RDF
+description = "Views style plugin to render node content as RDF."
+package = Views
+core = 6.x
+dependencies[] = views
+php = 5.1
